@@ -1,3 +1,5 @@
 <?php
-require 'vendor/autoload.php';
-echo 42;
+namespace Kronofoto;
+
+$app = require_once dirname(__DIR__) . '/config/bootstrap.php';
+$app->run();
