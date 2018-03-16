@@ -4,7 +4,7 @@ namespace Kronofoto;
 
 //use Interop\Container\ContainerInterface;
 
-class DonorController 
+class DonorController
 {
     public function read(Request $request, Response $response, array $args) 
     {

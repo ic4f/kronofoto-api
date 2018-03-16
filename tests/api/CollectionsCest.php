@@ -10,11 +10,7 @@ class CollectionsCest
     {
         $I->wantTo('get data in JSON format');
         $I->sendGET(self::URL); 
-
-        //TODO: these lines should be included in all test
-        $I->seeResponseCodeIs(\Codeception\Util\HttpCode::OK); //200
-        $I->seeHttpHeader('Content-type', 'application/json;charset=utf-8');
-        $I->seeResponseIsJson();
+        $this->checkJson($I);
     }
 
     public function testRecordCount(ApiTester $I)
@@ -22,12 +18,8 @@ class CollectionsCest
         $count = self::COLLECTIONS_ALL;
         $I->wantTo("get $count collections");
         $I->sendGET(self::URL); 
+        $this->checkJson($I);
 
-        $I->seeResponseCodeIs(\Codeception\Util\HttpCode::OK); //200
-        $I->seeHttpHeader('Content-type', 'application/json;charset=utf-8');
-        $I->seeResponseIsJson();
-
-        //now check the data
         $data = $I->grabDataFromResponseByJsonPath('$*');
         $I->assertEquals($count, count($data));
     }
@@ -36,10 +28,7 @@ class CollectionsCest
     {
         $I->wantTo('get data in correct format');
         $I->sendGET(self::URL); 
-
-        $I->seeResponseCodeIs(\Codeception\Util\HttpCode::OK); //200
-        $I->seeHttpHeader('Content-type', 'application/json;charset=utf-8');
-        $I->seeResponseIsJson();
+        $this->checkJson($I);
 
         $I->seeResponseMatchesJsonType([
             'id' => 'integer',
@@ -54,5 +43,54 @@ class CollectionsCest
             'donor_id' => 'integer',
             'featured_item_id' => 'integer|null'
         ], '$*');
+    }
+
+    public function testSortingYearMin(ApiTester $I) 
+    {
+        $I->wantTo('get sorted by year_min');
+        $I->sendGET(self::URL . '?sort=year_min'); 
+        $this->checkJson($I);
+        $data = $I->grabDataFromResponseByJsonPath('$*');
+
+        $this->checkIsSorted($I, $data, 'year_min');
+    }
+
+
+    //public function testSortingYearMinAcs(ApiTester $I) 
+    //{
+    //    $I->wantTo('get sorted by year_min; ascending order');
+    //    $I->sendGET(self::URL . '?sort=+year_min'); 
+    //    $this->checkJson($I);
+    //    $data = $I->grabDataFromResponseByJsonPath('$*');
+
+    //    $this->checkIsSorted($I, $data, 'year_min');
+    //}
+
+
+    //public function testSortingYearMinDesc(ApiTester $I) 
+    //{
+    //    $I->wantTo('get sorted by year_min; descending order');
+    //    $I->sendGET(self::URL . '?sort=-year_min'); 
+    //    $this->checkJson($I);
+    //    $data = $I->grabDataFromResponseByJsonPath('$*');
+
+    //    $this->checkIsSorted($I, $data, 'year_min');
+    //}
+
+    private function checkIsSorted(ApiTester $I, $recordset, $col)
+    {
+        $current = $recordset[0][$col];
+        foreach ($recordset as $row) {
+            $next = $row[$col];
+            $I->assertLessThanOrEqual($current, $next);
+            $current = $next;
+        }
+    } 
+
+    private function checkJson(ApiTester $I) 
+    {
+        $I->seeResponseCodeIs(\Codeception\Util\HttpCode::OK); //200
+        $I->seeHttpHeader('Content-type', 'application/json;charset=utf-8');
+        $I->seeResponseIsJson();
     }
 }
