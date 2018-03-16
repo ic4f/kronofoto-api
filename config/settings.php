@@ -4,7 +4,6 @@ $local = require ROOT_PATH . '/config/settings-local.php';
 
 $main = [
     //TODO: change to false for production
-    'displayErrorDetails' => true,
     'addContentLengthHeader' => false
 ];
 
