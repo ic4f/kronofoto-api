@@ -1,0 +1,10 @@
+actor: ApiTester
+modules:
+  enabled:
+    - Asserts
+    - \Helper\Unit
+    - REST:
+        depends: PhpBrowser
+        url: http://localhost:8001
+        part: Json
+
