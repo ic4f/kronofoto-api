@@ -29,15 +29,16 @@ class CollectionController
         //$sort = $request->getQueryParam('sort');
         $qp = $request->getQueryParams();
 
+        $qb
+            ->select('*') //TODO change this
+            ->from('archive_collection');
+
         if (array_key_exists('sort', $qp)) {
             $sort = $qp['sort'];
 
             $order = 'ASC';
-            //is there ordering specified?
-            if ($sort[0] == '+' || $sort[0] == '-') {
-                if ($sort[0] == '-') {
-                    $order = 'DESC';
-                }
+            if ($sort[0] === '-') {
+                $order = 'DESC';
                 $sort = substr($sort, 1);
             }
 
@@ -45,28 +46,21 @@ class CollectionController
                 throw new \Exception("$sort is not a valid field");
             }
 
-            print("\n $sort and $order ");
 
-
-
-
-
-/*
             $qb
-                ->select('*') //TODO change this
-                ->from('archive_collection')
-                ->orderBy('
+                ->orderBy($sort, $order);
 
- */
+
 
         }
+        $stmt = $qb->execute();
 
 
 
 
-        $sql = 'select * from archive_collection limit 5';
-        $stmt = $conn->prepare($sql);
-        $stmt->execute();
+        //$sql = 'select * from archive_collection limit 5';
+        //$stmt = $conn->prepare($sql);
+        //$stmt->execute();
         $result = $stmt->fetchAll();
 
         return $response->withJson($result);
@@ -75,7 +69,7 @@ class CollectionController
     private function validateField($field)
     {
         $dbFields = 
-            ['id', 'name', 'year_min', 'year_max', 'item_count', 'is_published', 'created', 'modified', 'donor_id'];
+            ['id', 'name', 'year_min', 'year_max', 'item_count', 'is_published', 'created', 'modified', 'donor_id', 'featured_item_id'];
         return in_array($field, $dbFields);
     }
 
