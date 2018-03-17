@@ -4,7 +4,8 @@ class CollectionsCest
 {
     //TODO: move these out into a helper class or a config location
     const URL = '/collections';
-    const COLLECTIONS_ALL = 296;
+
+    //all records are published (is_published = 1), unless noted otherwise
 
     public function testResponseIsJson(ApiTester $I)
     {
@@ -17,7 +18,7 @@ class CollectionsCest
 
     public function testRecordCount(ApiTester $I)
     {
-        $count = self::COLLECTIONS_ALL;
+        $count = 101;
         $I->wantTo("get $count records");
         $I->sendGET(self::URL); 
         $data = $I->grabDataFromResponseByJsonPath('$*');
@@ -36,12 +37,47 @@ class CollectionsCest
             'year_max' => 'integer|null',
             'item_count' => 'integer',
             'is_published' => 'integer',
-            'description' => 'string',
             'created' => 'string',
             'modified' => 'string',
+            'featured_item_id' => 'integer|null',
             'donor_id' => 'integer',
-            'featured_item_id' => 'integer|null'
+            'donor_first_name' => 'string',
+            'donor_last_name' => 'string'
         ], '$*');
+    }
+
+    public function testFilterByYearMin(ApiTester $I) 
+    {
+        $yearMin = 1950;
+        $expected = 19;
+        $I->wantTo("filter records by criteria: year_min = $yearMin");
+        $I->sendGET(self::URL . "?year_min=$yearMin");
+
+        $data = $I->grabDataFromResponseByJsonPath('$*');
+        $I->assertEquals($expected, count($data));
+    }
+
+    public function testFilterByYearMax(ApiTester $I) 
+    {
+        $yearMax = 1950;
+        $expected = 8;
+        $I->wantTo("filter records by criteria: year_max = $yearMax");
+        $I->sendGET(self::URL . "?year_max=$yearMax");
+
+        $data = $I->grabDataFromResponseByJsonPath('$*');
+        $I->assertEquals($expected, count($data));
+    }
+
+    public function testFilterByYearMinAndMax(ApiTester $I) 
+    {
+        $yearMin = 1950;
+        $yearMax = 1980;
+        $expected = 6;
+        $I->wantTo("filter records by criteria: year_min = $yearMin, year_max = $yearMax");;
+        $I->sendGET(self::URL . "?year_min=$yearMin&year_max=$yearMax");
+
+        $data = $I->grabDataFromResponseByJsonPath('$*');
+        $I->assertEquals($expected, count($data));
     }
 
     public function testSortedYearMinAcs(ApiTester $I) 
@@ -143,7 +179,6 @@ class CollectionsCest
     {
         $previous = $isDesc ? 9999 : null;
 
-        //TODO: datetime fields may require special processing
         foreach ($recordset as $row) {
             $current= $row[$col];
             if ($isDesc) {
@@ -154,55 +189,4 @@ class CollectionsCest
             $previous = $current;
         }
     }
-
-
-
-/*
-    public function testSortingYearMaxAcs(ApiTester $I) 
-    {
-        $I->wantTo('get records sorted by year_max in acsending order');
-        $I->sendGET(self::URL . '?sort=year_max'); 
-        $data = $I->grabDataFromResponseByJsonPath('$*');
-        $this->checkIsSortedAcs($I, $data, 'year_max');
-    }
-
-    public function testSortingYearMaxDesc(ApiTester $I) 
-    {
-        $I->wantTo('get records sorted by year_max in descending order');
-        $I->sendGET(self::URL . '?sort=-year_max'); 
-        $data = $I->grabDataFromResponseByJsonPath('$*');
-        $this->checkIsSortedDesc($I, $data, 'year_max');
-    }
-
-    public function testSortingItemCountAcs(ApiTester $I) 
-    {
-        $I->wantTo('get records sorted by item_count in acsending order');
-        $I->sendGET(self::URL . '?sort=item_count'); 
-        $data = $I->grabDataFromResponseByJsonPath('$*');
-        $this->checkIsSortedAcs($I, $data, 'item_count');
-    }
-
-    public function testSortingItemCountDesc(ApiTester $I) 
-    {
-        $I->wantTo('get records sorted by item_count in descending order');
-        $I->sendGET(self::URL . '?sort=-item_count'); 
-        $data = $I->grabDataFromResponseByJsonPath('$*');
-        $this->checkIsSortedDesc($I, $data, 'item_count');
-    }
-
- */
-    private function bcheckIsSorted(ApiTester $I, $recordset, $col, $isDesc)
-    {
-        $previous = $isDesc ? 9999 : null;
-
-        foreach ($recordset as $row) {
-            $current= $row[$col];
-            if ($isDesc) {
-                $I->assertGreaterThanOrEqual($current, $previous);
-            } else {
-                $I->assertLessThanOrEqual($current, $previous);
-            }
-            $previous = $current;
-        }
-    } 
 }

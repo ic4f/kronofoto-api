@@ -22,19 +22,47 @@ class CollectionController
     {
         $conn = $this->container->db;
 
-        $qb = $conn->createQueryBuilder();
+        $qBuilder = $conn->createQueryBuilder();
 
-        //now check for, then process the query string
-        //
-        //$sort = $request->getQueryParam('sort');
-        $qp = $request->getQueryParams();
+        $qParams = $request->getQueryParams();
 
-        $qb
-            ->select('*') //TODO change this
-            ->from('archive_collection');
+        $qBuilder
+            ->select(
+                'c.id', 
+                'c.name', 
+                'c.year_min', 
+                'c.year_max', 
+                'c.item_count', 
+                'c.is_published',
+                'c.created',
+                'c.modified',
+                'c.featured_item_id',
+                'c.donor_id',
+                'u.first_name as donor_first_name',
+                'u.last_name as donor_last_name')
+                ->from('archive_collection', 'c')
+                ->innerJoin('c', 'accounts_user', 'u', 'c.donor_id = u.id')
+                ->where('is_published = 1'); //because for now this is for public site only
 
-        if (array_key_exists('sort', $qp)) {
-            $sort = $qp['sort'];
+
+        //TODO refactor all this
+
+        if (array_key_exists('year_min', $qParams)) {
+            $yearMin = $qParams['year_min'];
+            $qBuilder
+                ->andWhere('year_min >= :yearMin')
+                ->setParameter('yearMin', $yearMin);
+        }
+        
+        if (array_key_exists('year_max', $qParams)) {
+            $yearMax = $qParams['year_max'];
+            $qBuilder
+                ->andWhere('year_max <= :yearMax')
+                ->setParameter('yearMax', $yearMax);
+        }
+
+        if (array_key_exists('sort', $qParams)) {
+            $sort = $qParams['sort'];
 
             $order = 'ASC';
             if ($sort[0] === '-') {
@@ -47,20 +75,13 @@ class CollectionController
             }
 
 
-            $qb
+            $qBuilder
                 ->orderBy($sort, $order);
 
 
 
         }
-        $stmt = $qb->execute();
-
-
-
-
-        //$sql = 'select * from archive_collection limit 5';
-        //$stmt = $conn->prepare($sql);
-        //$stmt->execute();
+        $stmt = $qBuilder->execute();
         $result = $stmt->fetchAll();
 
         return $response->withJson($result);
