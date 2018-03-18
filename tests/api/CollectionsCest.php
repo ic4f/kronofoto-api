@@ -4,9 +4,10 @@ class CollectionsCest
 {
     //TODO: move these out into a helper class or a config location
     const URL = '/collections';
+    //TODO: how do I pull this from the app's config?
+    const MAX_RECORDS = 100;
 
     //all records are published (is_published = 1), unless noted otherwise
-
     public function testResponseIsJson(ApiTester $I)
     {
         $I->wantTo('get data in JSON format');
@@ -16,10 +17,10 @@ class CollectionsCest
         $I->seeResponseIsJson();
     }
 
-    public function testRecordCount(ApiTester $I)
+    public function testMaxRecordCount(ApiTester $I)
     {
-        $count = 101;
-        $I->wantTo("get $count records");
+        $count = self::MAX_RECORDS; //otherwise would be 101
+        $I->wantTo("get not more than $count records");
         $I->sendGET(self::URL); 
         $data = $I->grabDataFromResponseByJsonPath('$*');
         $I->assertEquals($count, count($data));
@@ -46,12 +47,27 @@ class CollectionsCest
         ], '$*');
     }
 
+    public function testPaging(ApiTester $I) 
+    {
+        $offset = 42;
+        $limit = 10;
+        $sort_by = 'id';
+        $expected_first_id = 51;
+        $expected_last_id = 60;
+        $I->wantTo("get $limit records starting after record # $offset");
+        $I->sendGET(self::URL . "?offset=$offset&limit=$limit"); 
+        $data = $I->grabDataFromResponseByJsonPath('$*');
+        $I->assertEquals($limit, count($data));
+        $I->assertEquals($expected_first_id, $data[0]['id']);
+        $I->assertEquals($expected_last_id, $data[$limit-1]['id']);
+    }
+
     public function testFilterByYearMin(ApiTester $I) 
     {
         $yearMin = 1950;
         $expected = 19;
         $I->wantTo("filter records by criteria: year_min = $yearMin");
-        $I->sendGET(self::URL . "?year_min=$yearMin");
+        $I->sendGET(self::URL . "?filter[year_min]=$yearMin");
 
         $data = $I->grabDataFromResponseByJsonPath('$*');
         $I->assertEquals($expected, count($data));
@@ -62,7 +78,7 @@ class CollectionsCest
         $yearMax = 1950;
         $expected = 8;
         $I->wantTo("filter records by criteria: year_max = $yearMax");
-        $I->sendGET(self::URL . "?year_max=$yearMax");
+        $I->sendGET(self::URL . "?filter[year_max]=$yearMax");
 
         $data = $I->grabDataFromResponseByJsonPath('$*');
         $I->assertEquals($expected, count($data));
@@ -74,7 +90,7 @@ class CollectionsCest
         $yearMax = 1980;
         $expected = 6;
         $I->wantTo("filter records by criteria: year_min = $yearMin, year_max = $yearMax");;
-        $I->sendGET(self::URL . "?year_min=$yearMin&year_max=$yearMax");
+        $I->sendGET(self::URL . "?filter[year_min]=$yearMin&filter[year_max]=$yearMax");
 
         $data = $I->grabDataFromResponseByJsonPath('$*');
         $I->assertEquals($expected, count($data));

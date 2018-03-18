@@ -18,8 +18,21 @@ class CollectionController
     {
     }
 
+    public function validateField($field)
+    {
+        $dbFields = 
+            ['id', 'name', 'year_min', 'year_max', 'item_count', 'is_published', 'created', 'modified', 'donor_id', 'featured_item_id'];
+        if (!in_array($field, $dbFields)) {
+            throw new \Exception("$field is not a valid field name");
+        }
+    }
+
     public function getCollections(Request $request, Response $response, array $args) 
     {
+        //TODO: change this (default paging should come from the config)
+        $offset = 0; //default
+        $limit = 100; //default
+
         $conn = $this->container->db;
 
         $qBuilder = $conn->createQueryBuilder();
@@ -46,19 +59,29 @@ class CollectionController
 
 
         //TODO refactor all this
+        if (array_key_exists('filter', $qParams)) {
+            //get filtering params
+            $filterParams = $qParams['filter'];
 
-        if (array_key_exists('year_min', $qParams)) {
-            $yearMin = $qParams['year_min'];
-            $qBuilder
-                ->andWhere('year_min >= :yearMin')
-                ->setParameter('yearMin', $yearMin);
-        }
-        
-        if (array_key_exists('year_max', $qParams)) {
-            $yearMax = $qParams['year_max'];
-            $qBuilder
-                ->andWhere('year_max <= :yearMax')
-                ->setParameter('yearMax', $yearMax);
+            //now validate
+            foreach ($filterParams as $field=>$val) {
+                $this->validateField($field);
+            } 
+
+
+            if (array_key_exists('year_min', $filterParams)) {
+                $yearMin = $filterParams['year_min'];
+                $qBuilder
+                    ->andWhere('year_min >= :yearMin')
+                    ->setParameter('yearMin', $yearMin);
+            }
+
+            if (array_key_exists('year_max', $filterParams)) {
+                $yearMax = $filterParams['year_max'];
+                $qBuilder
+                    ->andWhere('year_max <= :yearMax')
+                    ->setParameter('yearMax', $yearMax);
+            }
         }
 
         if (array_key_exists('sort', $qParams)) {
@@ -70,28 +93,31 @@ class CollectionController
                 $sort = substr($sort, 1);
             }
 
-            if (!$this->validateField($sort)) {
-                throw new \Exception("$sort is not a valid field");
-            }
+            $this->validateField($sort);
 
 
             $qBuilder
                 ->orderBy($sort, $order);
 
-
-
         }
+
+        //now process paging TODO: ADD VALIDATION!
+        if (array_key_exists('limit', $qParams)) {
+            $limit = (int)$qParams['limit'];
+        }
+        if (array_key_exists('offset', $qParams)) {
+            $offset = (int)$qParams['offset'];
+        }
+
+
+        $qBuilder
+            ->setFirstResult($offset)
+            ->setMaxResults($limit);
+
         $stmt = $qBuilder->execute();
         $result = $stmt->fetchAll();
 
         return $response->withJson($result);
-    }
-
-    private function validateField($field)
-    {
-        $dbFields = 
-            ['id', 'name', 'year_min', 'year_max', 'item_count', 'is_published', 'created', 'modified', 'donor_id', 'featured_item_id'];
-        return in_array($field, $dbFields);
     }
 
     public function getDonorCollections(Request $request, Response $response, array $args) 
