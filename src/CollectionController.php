@@ -14,6 +14,11 @@ class CollectionController
         $this->container = $container;
     }
 
+    public function test42() 
+    {
+        return 41;
+    }
+
     public function read(Request $request, Response $response, array $args) 
     {
     }
@@ -58,7 +63,7 @@ class CollectionController
                 ->where('is_published = 1'); //because for now this is for public site only
 
 
-        //TODO refactor all this
+        //TODO process filtering
         if (array_key_exists('filter', $qParams)) {
             //get filtering params
             $filterParams = $qParams['filter'];
@@ -84,6 +89,7 @@ class CollectionController
             }
         }
 
+        //TODO process sorting
         if (array_key_exists('sort', $qParams)) {
             $sort = $qParams['sort'];
 
