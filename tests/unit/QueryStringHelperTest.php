@@ -1,4 +1,7 @@
 <?php
+namespace Kronofoto\Test;
+
+use Kronofoto\QueryStringHelper;;
 
 class QueryStringHelperTest extends \Codeception\Test\Unit
 {
@@ -10,62 +13,80 @@ class QueryStringHelperTest extends \Codeception\Test\Unit
         $this->container = $app->getContainer();
     }
 
-
-    /* -------------------- test paging -------------------- */
-    public function testGetOffset()
+    /* -------------------- test filtering ------------------ */
+    /* TODO: implement for item, not collection.
+    public function testHasFilterParam()
     {
-        $offset = 12;
-        $params = array('offset' => $offset);
-        $qs = new Kronofoto\QueryStringHelper($params, $this->container);
-        $this->assertEquals($offset, $qs->getOffset());
+        $params = array('a' => 'foo', 'filter' => array());
+        $qs = new QueryStringHelper($params, $this->container);
+        $this->assertTrue($qs->hasFilterParam());
     }
 
-    public function testGetDefaultOffset()
+    public function testHasNoFilterParam()
     {
-        $params = array();
-        $qs = new Kronofoto\QueryStringHelper($params, $this->container);
-        $this->assertEquals(0, $qs->getOffset());
+        $params = array('a' => 'foo');
+        $qs = new QueryStringHelper($params, $this->container);
+        $this->assertFalse($qs->hasFilterParam());
     }
 
-    public function testGetLimit()
+    public function testFilterParamInvalid()
     {
-        $limit = 17;
-        $params = array('limit' => $limit);
-        $qs = new Kronofoto\QueryStringHelper($params, $this->container);
-        $this->assertEquals($limit, $qs->getLimit());
+        $this->expectException(\Exception::class);
+
+        $filterArray = array('invalid' => '111');
+        $params = array('a' => 'foo', 'filter' => $filterArray);
+        $qs = new QueryStringHelper($params, $this->container);
+        $qs->getFilterParams();
     }
 
-    public function testGetDefaultLimit()
+    public function testFilterParamEmptyValue()
     {
-        $defaultLimit = (int)$this->container['settings']['paging']['default_page_size'];
-        $params = array();
-        $qs = new Kronofoto\QueryStringHelper($params, $this->container);
-        $this->assertEquals($defaultLimit, $qs->getLimit());
+        $this->expectException(\Exception::class);
+
+        $filterArray = array('id' => '');
+        $params = array('a' => 'foo', 'filter' => $filterArray);
+        $qs = new QueryStringHelper($params, $this->container);
+        $qs->getFilterParams();
     }
 
-    public function testGetLimitCappedByMaxRecords()
+    public function testGetFilterParams()
     {
-        $limit = 999999;
-        $maxRecords = (int)$this->container['settings']['paging']['max_records'];
-        $params = array('limit' => $limit);
-        $qs = new Kronofoto\QueryStringHelper($params, $this->container);
-        $this->assertEquals($maxRecords, $qs->getLimit());
+        $filterArray = array('id' => '111', 'donor_id' => '222');
+        $params = array('a' => 'foo', 'filter' => $filterArray);
+        $expected = array(
+            ['field' => 'id', 'operator' => '=', 'value' => '111'],
+            ['field' => 'donor_id', 'operator' => '=', 'value' => '222']
+        );
+        $qs = new QueryStringHelper($params, $this->container);
+        $this->assertEquals($expected, $qs->getFilterParams());
     }
 
-
+    public function testGetFilterMinMaxParams()
+    {
+        $filterArray = array('id' => '111', 'year_min' => '222', 'year_max' => '333');
+        $params = array('a' => 'foo', 'filter' => $filterArray);
+        $expected = array(
+            ['field' => 'id', 'operator' => '=', 'value' => '111'],
+            ['field' => 'year_min', 'operator' => '<=', 'value' => '222'],
+            ['field' => 'year_max', 'operator' => '>=', 'value' => '333']
+        );
+        $qs = new QueryStringHelper($params, $this->container);
+        $this->assertEquals($expected, $qs->getFilterParams());
+    }
+     */
 
     /* -------------------- test sorting -------------------- */
     public function testHasSortParam()
     {
         $params = array('a' => 'foo', 'sort' => 'id');
-        $qs = new Kronofoto\QueryStringHelper($params, $this->container);
+        $qs = new QueryStringHelper($params, $this->container);
         $this->assertTrue($qs->hasSortParam());
     }
 
     public function testHasNoSortParam()
     {
         $params = array('a' => 'foo', 'b' => 'bar');
-        $qs = new Kronofoto\QueryStringHelper($params, $this->container);
+        $qs = new QueryStringHelper($params, $this->container);
         $this->assertFalse($qs->hasSortParam());
     }
 
@@ -73,7 +94,7 @@ class QueryStringHelperTest extends \Codeception\Test\Unit
     {
         $sortField = 'id';
         $params = array('a' => 'foo', 'sort' => $sortField);
-        $qs = new Kronofoto\QueryStringHelper($params, $this->container);
+        $qs = new QueryStringHelper($params, $this->container);
         $this->assertEquals($sortField, $qs->getSortField());
     }
 
@@ -81,21 +102,21 @@ class QueryStringHelperTest extends \Codeception\Test\Unit
     {
         $sortField = 'id';
         $params = array('a' => 'foo', 'sort' => '-' . $sortField);
-        $qs = new Kronofoto\QueryStringHelper($params, $this->container);
+        $qs = new QueryStringHelper($params, $this->container);
         $this->assertEquals($sortField, $qs->getSortField());
     }
 
     public function testGetAcsendingSortOrder()
     {
         $params = array('a' => 'foo', 'sort' => 'id');
-        $qs = new Kronofoto\QueryStringHelper($params, $this->container);
+        $qs = new QueryStringHelper($params, $this->container);
         $this->assertEquals('ASC', $qs->getSortOrder());
     }
 
     public function testGetDecsendingSortOrder()
     {
         $params = array('a' => 'foo', 'sort' => '-id');
-        $qs = new Kronofoto\QueryStringHelper($params, $this->container);
+        $qs = new QueryStringHelper($params, $this->container);
         $this->assertEquals('DESC', $qs->getSortOrder());
     }
 
@@ -104,7 +125,57 @@ class QueryStringHelperTest extends \Codeception\Test\Unit
         $this->expectException(\Exception::class);
 
         $params = array('a' => 'foo', 'sort' => 'invalid');
-        $qs = new Kronofoto\QueryStringHelper($params, $this->container);
+        $qs = new QueryStringHelper($params, $this->container);
         $qs->getSortField();
+    }
+
+    public function testSortFieldEmpty()
+    {
+        $this->expectException(\Exception::class);
+
+        $params = array('a' => 'foo', 'sort' => '');
+        $qs = new QueryStringHelper($params, $this->container);
+        $qs->getSortField();
+    }
+
+    /* -------------------- test paging -------------------- */
+    public function testGetOffset()
+    {
+        $offset = 12;
+        $params = array('offset' => $offset);
+        $qs = new QueryStringHelper($params, $this->container);
+        $this->assertEquals($offset, $qs->getOffset());
+    }
+
+    public function testGetDefaultOffset()
+    {
+        $params = array();
+        $qs = new QueryStringHelper($params, $this->container);
+        $this->assertEquals(0, $qs->getOffset());
+    }
+
+    public function testGetLimit()
+    {
+        $limit = 17;
+        $params = array('limit' => $limit);
+        $qs = new QueryStringHelper($params, $this->container);
+        $this->assertEquals($limit, $qs->getLimit());
+    }
+
+    public function testGetDefaultLimit()
+    {
+        $defaultLimit = (int)$this->container['settings']['paging']['default_page_size'];
+        $params = array();
+        $qs = new QueryStringHelper($params, $this->container);
+        $this->assertEquals($defaultLimit, $qs->getLimit());
+    }
+
+    public function testGetLimitCappedByMaxRecords()
+    {
+        $limit = 999999;
+        $maxRecords = (int)$this->container['settings']['paging']['max_records'];
+        $params = array('limit' => $limit);
+        $qs = new QueryStringHelper($params, $this->container);
+        $this->assertEquals($maxRecords, $qs->getLimit());
     }
 }

@@ -1,4 +1,7 @@
 <?php
+namespace Kronofoto\Test;
+
+use ApiTester;
 
 class CollectionsCest
 {
@@ -70,41 +73,7 @@ class CollectionsCest
         $I->assertEquals($expected_first_id, $data[0]['id']);
         $I->assertEquals($expected_last_id, $data[$limit-1]['id']);
     }
-/*
-    public function testFilterByYearMin(ApiTester $I) 
-    {
-        $yearMin = 1950;
-        $expected = 19;
-        $I->wantTo("filter records by criteria: year_min = $yearMin");
-        $I->sendGET(self::URL . "?filter[year_min]=$yearMin");
-
-        $data = $I->grabDataFromResponseByJsonPath('$*');
-        $I->assertEquals($expected, count($data));
-    }
-
-    public function testFilterByYearMax(ApiTester $I) 
-    {
-        $yearMax = 1950;
-        $expected = 8;
-        $I->wantTo("filter records by criteria: year_max = $yearMax");
-        $I->sendGET(self::URL . "?filter[year_max]=$yearMax");
-
-        $data = $I->grabDataFromResponseByJsonPath('$*');
-        $I->assertEquals($expected, count($data));
-    }
-
-    public function testFilterByYearMinAndMax(ApiTester $I) 
-    {
-        $yearMin = 1950;
-        $yearMax = 1980;
-        $expected = 6;
-        $I->wantTo("filter records by criteria: year_min = $yearMin, year_max = $yearMax");;
-        $I->sendGET(self::URL . "?filter[year_min]=$yearMin&filter[year_max]=$yearMax");
-
-        $data = $I->grabDataFromResponseByJsonPath('$*');
-        $I->assertEquals($expected, count($data));
-    }
- */ 
+  
     public function testSortedYearMinAcs(ApiTester $I) 
     {
         $this->testSorted($I, 'year_min', false);
