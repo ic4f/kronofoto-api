@@ -4,8 +4,14 @@ class CollectionsCest
 {
     //TODO: move these out into a helper class or a config location
     const URL = '/collections';
-    //TODO: how do I pull this from the app's config?
-    const MAX_RECORDS = 100;
+
+    protected $container; 
+
+    public function _before(ApiTester $I)
+    {
+        $app = require dirname(dirname(__DIR__)) . '/config/bootstrap.php';
+        $this->container = $app->getContainer();
+    }
 
     //all records are published (is_published = 1), unless noted otherwise
     public function testResponseIsJson(ApiTester $I)
@@ -19,9 +25,12 @@ class CollectionsCest
 
     public function testMaxRecordCount(ApiTester $I)
     {
-        $count = self::MAX_RECORDS; //otherwise would be 101
+        //this will work ONLY if there is a limit param:
+        //max_records is NOT the default page size - it's a guard against
+        //a page that is too large.
+        $count = (int)$this->container['settings']['paging']['max_records'];
         $I->wantTo("get not more than $count records");
-        $I->sendGET(self::URL); 
+        $I->sendGET(self::URL . "?limit=999999"); 
         $data = $I->grabDataFromResponseByJsonPath('$*');
         $I->assertEquals($count, count($data));
     }
@@ -61,7 +70,7 @@ class CollectionsCest
         $I->assertEquals($expected_first_id, $data[0]['id']);
         $I->assertEquals($expected_last_id, $data[$limit-1]['id']);
     }
-
+/*
     public function testFilterByYearMin(ApiTester $I) 
     {
         $yearMin = 1950;
@@ -95,7 +104,7 @@ class CollectionsCest
         $data = $I->grabDataFromResponseByJsonPath('$*');
         $I->assertEquals($expected, count($data));
     }
-
+ */ 
     public function testSortedYearMinAcs(ApiTester $I) 
     {
         $this->testSorted($I, 'year_min', false);
@@ -155,7 +164,7 @@ class CollectionsCest
     {
         $this->testSorted($I, 'modified', true);
     }
- 
+
     public function testSortedDonorIdAcs(ApiTester $I) 
     {
         $this->testSorted($I, 'donor_id', false);
@@ -165,17 +174,16 @@ class CollectionsCest
     {
         $this->testSorted($I, 'donor_id', true);
     }
- 
+
     public function testSortedFeaturedItemIdAcs(ApiTester $I) 
     {
         $this->testSorted($I, 'featured_item_id', false);
     }
- 
+
     public function testSortedFeaturedItemIdDesc(ApiTester $I) 
     {
         $this->testSorted($I, 'featured_item_id', true);
     }
- 
 
     /* ------------------- private ----------------------- */
 

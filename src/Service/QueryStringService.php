@@ -14,7 +14,8 @@ class QueryStringService
 
     public function test5() 
     {
-        return 5;
+        $t = $this->container['settings']['test42'];
+        return $t;
     }
 
     //TODO this is where all the query string processing goes.

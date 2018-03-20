@@ -14,29 +14,12 @@ class CollectionController
         $this->container = $container;
     }
 
-    public function test42() 
-    {
-        return 41;
-    }
-
     public function read(Request $request, Response $response, array $args) 
     {
     }
 
-    public function validateField($field)
-    {
-        $dbFields = 
-            ['id', 'name', 'year_min', 'year_max', 'item_count', 'is_published', 'created', 'modified', 'donor_id', 'featured_item_id'];
-        if (!in_array($field, $dbFields)) {
-            throw new \Exception("$field is not a valid field name");
-        }
-    }
-
     public function getCollections(Request $request, Response $response, array $args) 
     {
-        //TODO: change this (default paging should come from the config)
-        $offset = 0; //default
-        $limit = 100; //default
 
         $conn = $this->container->db;
 
@@ -63,63 +46,77 @@ class CollectionController
                 ->where('is_published = 1'); //because for now this is for public site only
 
 
-        //TODO process filtering
-        if (array_key_exists('filter', $qParams)) {
-            //get filtering params
-            $filterParams = $qParams['filter'];
-
-            //now validate
-            foreach ($filterParams as $field=>$val) {
-                $this->validateField($field);
-            } 
 
 
-            if (array_key_exists('year_min', $filterParams)) {
-                $yearMin = $filterParams['year_min'];
-                $qBuilder
-                    ->andWhere('year_min >= :yearMin')
-                    ->setParameter('yearMin', $yearMin);
-            }
+        $qs = new QueryStringHelper($qParams, $this->container);
 
-            if (array_key_exists('year_max', $filterParams)) {
-                $yearMax = $filterParams['year_max'];
-                $qBuilder
-                    ->andWhere('year_max <= :yearMax')
-                    ->setParameter('yearMax', $yearMax);
-            }
-        }
-
-        //TODO process sorting
-        if (array_key_exists('sort', $qParams)) {
-            $sort = $qParams['sort'];
-
-            $order = 'ASC';
-            if ($sort[0] === '-') {
-                $order = 'DESC';
-                $sort = substr($sort, 1);
-            }
-
-            $this->validateField($sort);
-
-
+        if ($qs->hasSortParam()) {
             $qBuilder
-                ->orderBy($sort, $order);
-
+                ->orderBy($qs->getSortField(), $qs->getSortOrder());
         }
 
-        //now process paging TODO: ADD VALIDATION!
-        if (array_key_exists('limit', $qParams)) {
-            $limit = (int)$qParams['limit'];
-        }
-        if (array_key_exists('offset', $qParams)) {
-            $offset = (int)$qParams['offset'];
-        }
-
+        //$offset = 0; //default
+        //$limit = $this->container['settings']['paging']['max_records'];
 
         $qBuilder
-            ->setFirstResult($offset)
-            ->setMaxResults($limit);
+            ->setFirstResult($qs->getOffset())
+            ->setMaxResults($qs->getLimit());
 
+
+        //        //TODO process filtering
+        //        if (array_key_exists('filter', $qParams)) {
+        //            //get filtering params
+        //            $filterParams = $qParams['filter'];
+        //
+        //            //now validate
+        //            foreach ($filterParams as $field=>$val) {
+        //                $this->validateField($field);
+        //            } 
+        //
+        //
+        //            if (array_key_exists('year_min', $filterParams)) {
+        //                $yearMin = $filterParams['year_min'];
+        //                $qBuilder
+        //                    ->andWhere('year_min >= :yearMin')
+        //                    ->setParameter('yearMin', $yearMin);
+        //            }
+        //
+        //            if (array_key_exists('year_max', $filterParams)) {
+        //                $yearMax = $filterParams['year_max'];
+        //                $qBuilder
+        //                    ->andWhere('year_max <= :yearMax')
+        //                    ->setParameter('yearMax', $yearMax);
+        //            }
+        //        }
+        //
+        //
+        //        $ch = new SomeHelper($qParams); //takes the current param array at construction
+        //
+        //
+        //        if ($ch.hasFilter()) {
+        //            foreach ($filterObjects as $filter) {
+        //                $qBuilder
+        //                    ->andWhere($filter->expression)
+        //                    ->setParameter($filter->column, $filter->value);
+        //            }
+        //        }
+        //
+        //
+        //
+
+        //        //now process paging TODO: ADD VALIDATION!
+        //        if (array_key_exists('limit', $qParams)) {
+        //            $limit = (int)$qParams['limit'];
+        //        }
+        //        if (array_key_exists('offset', $qParams)) {
+        //            $offset = (int)$qParams['offset'];
+        //        }
+        //
+        //
+        //$qBuilder
+            //            ->setFirstResult($offset)
+        //
+            //
         $stmt = $qBuilder->execute();
         $result = $stmt->fetchAll();
 
