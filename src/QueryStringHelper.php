@@ -6,21 +6,23 @@ use Interop\Container\ContainerInterface;
 
 class QueryStringHelper
 {
-    public const OFFSET_KEY = 'offset';
-    public const LIMIT_KEY = 'limit';
-    public const SORT_KEY = 'sort';
-    public const SORT_ORDER_DEFAULT = 'ASC';
-    public const SORT_ORDER_DESCENDING = 'DESC';
-    public const FILTER_KEY = 'filter';
-    public const FILTER_SUFFIX_MIN = '_min';
-    public const FILTER_SUFFIX_MAX = '_max';
+    const OFFSET_KEY = 'offset';
+    const LIMIT_KEY = 'limit';
+    const SORT_KEY = 'sort';
+    const SORT_ORDER_DEFAULT = 'ASC';
+    const SORT_ORDER_DESCENDING = 'DESC';
+    const FILTER_KEY = 'filter';
+    const FILTER_SUFFIX_MIN = '_min';
+    const FILTER_SUFFIX_MAX = '_max';
 
     private $params;
+    private $fields;
     private $container;
 
-    public function __construct(array $params, ContainerInterface $container)
+    public function __construct(array $params, array $fields, ContainerInterface $container)
     {
         $this->params = $params;
+        $this->fields = $fields;
         $this->container = $container;
     }
 
@@ -97,19 +99,7 @@ class QueryStringHelper
     //TODO refactor of course!!
     private function validateField($field)
     {
-        $dbFields = [
-            'id', 
-            'name', 
-            'year_min', 
-            'year_max', 
-            'item_count', 
-            'is_published', 
-            'created', 
-            'modified', 
-            'donor_id', 
-            'featured_item_id'
-        ];
-        if (!in_array($field, $dbFields)) {
+        if (!in_array($field, $this->fields)) {
             throw new \Exception("$field is not a valid field name");
         }
     }

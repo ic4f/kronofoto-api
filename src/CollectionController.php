@@ -6,7 +6,20 @@ use Psr\Http\Message\ResponseInterface as Response;
 use Interop\Container\ContainerInterface;
 
 class CollectionController 
-{
+{ 
+    const FIELDS = [
+        'id', 
+        'name', 
+        'year_min', 
+        'year_max', 
+        'item_count', 
+        'is_published', 
+        'created', 
+        'modified', 
+        'donor_id', 
+        'featured_item_id'
+    ];
+
     protected $container;
 
     public function __construct(ContainerInterface $container)
@@ -21,7 +34,6 @@ class CollectionController
 
     public function getCollections(Request $request, Response $response, array $args) 
     {
-
         $conn = $this->container->db;
 
         $qBuilder = $conn->createQueryBuilder();
@@ -41,12 +53,13 @@ class CollectionController
                 'c.featured_item_id',
                 'c.donor_id',
                 'u.first_name as donor_first_name',
-                'u.last_name as donor_last_name')
-                ->from('archive_collection', 'c')
-                ->innerJoin('c', 'accounts_user', 'u', 'c.donor_id = u.id')
-                ->where('is_published = 1'); //because for now this is for public site only
+                'u.last_name as donor_last_name'
+            )
+            ->from('archive_collection', 'c')
+            ->innerJoin('c', 'accounts_user', 'u', 'c.donor_id = u.id')
+            ->where('is_published = 1'); //because for now this is for public site only
 
-        $qs = new QueryStringHelper($qParams, $this->container);
+        $qs = new QueryStringHelper($qParams, self::FIELDS, $this->container);
 
         if ($qs->hasSortParam()) {
             $qBuilder
