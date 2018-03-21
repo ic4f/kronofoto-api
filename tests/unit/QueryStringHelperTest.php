@@ -1,7 +1,7 @@
 <?php
 namespace Kronofoto\Test;
 
-use Kronofoto\QueryStringHelper;;
+use Kronofoto\QueryStringHelper;
 
 class QueryStringHelperTest extends \Codeception\Test\Unit
 {
@@ -79,14 +79,14 @@ class QueryStringHelperTest extends \Codeception\Test\Unit
     public function testHasSortParam()
     {
         $params = array('a' => 'foo', 'sort' => 'id');
-        $qs = new QueryStringHelper($params, $this->container);
+        $qs = new QueryStringHelper($params, array(), $this->container);
         $this->assertTrue($qs->hasSortParam());
     }
 
     public function testHasNoSortParam()
     {
         $params = array('a' => 'foo', 'b' => 'bar');
-        $qs = new QueryStringHelper($params, $this->container);
+        $qs = new QueryStringHelper($params, array(), $this->container);
         $this->assertFalse($qs->hasSortParam());
     }
 
@@ -94,7 +94,7 @@ class QueryStringHelperTest extends \Codeception\Test\Unit
     {
         $sortField = 'id';
         $params = array('a' => 'foo', 'sort' => $sortField);
-        $qs = new QueryStringHelper($params, $this->container);
+        $qs = new QueryStringHelper($params, array($sortField), $this->container);
         $this->assertEquals($sortField, $qs->getSortField());
     }
 
@@ -102,21 +102,21 @@ class QueryStringHelperTest extends \Codeception\Test\Unit
     {
         $sortField = 'id';
         $params = array('a' => 'foo', 'sort' => '-' . $sortField);
-        $qs = new QueryStringHelper($params, $this->container);
+        $qs = new QueryStringHelper($params, array($sortField), $this->container);
         $this->assertEquals($sortField, $qs->getSortField());
     }
 
     public function testGetAcsendingSortOrder()
     {
         $params = array('a' => 'foo', 'sort' => 'id');
-        $qs = new QueryStringHelper($params, $this->container);
+        $qs = new QueryStringHelper($params, array(), $this->container);
         $this->assertEquals('ASC', $qs->getSortOrder());
     }
 
     public function testGetDecsendingSortOrder()
     {
         $params = array('a' => 'foo', 'sort' => '-id');
-        $qs = new QueryStringHelper($params, $this->container);
+        $qs = new QueryStringHelper($params, array(), $this->container);
         $this->assertEquals('DESC', $qs->getSortOrder());
     }
 
@@ -125,7 +125,7 @@ class QueryStringHelperTest extends \Codeception\Test\Unit
         $this->expectException(\Exception::class);
 
         $params = array('a' => 'foo', 'sort' => 'invalid');
-        $qs = new QueryStringHelper($params, $this->container);
+        $qs = new QueryStringHelper($params, array(), $this->container);
         $qs->getSortField();
     }
 
@@ -134,23 +134,24 @@ class QueryStringHelperTest extends \Codeception\Test\Unit
         $this->expectException(\Exception::class);
 
         $params = array('a' => 'foo', 'sort' => '');
-        $qs = new QueryStringHelper($params, $this->container);
+        $qs = new QueryStringHelper($params, array(), $this->container);
         $qs->getSortField();
     }
 
     /* -------------------- test paging -------------------- */
+    
     public function testGetOffset()
     {
         $offset = 12;
         $params = array('offset' => $offset);
-        $qs = new QueryStringHelper($params, $this->container);
+        $qs = new QueryStringHelper($params, array(), $this->container);
         $this->assertEquals($offset, $qs->getOffset());
     }
 
     public function testGetDefaultOffset()
     {
         $params = array();
-        $qs = new QueryStringHelper($params, $this->container);
+        $qs = new QueryStringHelper($params, array(), $this->container);
         $this->assertEquals(0, $qs->getOffset());
     }
 
@@ -158,7 +159,7 @@ class QueryStringHelperTest extends \Codeception\Test\Unit
     {
         $limit = 17;
         $params = array('limit' => $limit);
-        $qs = new QueryStringHelper($params, $this->container);
+        $qs = new QueryStringHelper($params, array(), $this->container);
         $this->assertEquals($limit, $qs->getLimit());
     }
 
@@ -166,7 +167,7 @@ class QueryStringHelperTest extends \Codeception\Test\Unit
     {
         $defaultLimit = (int)$this->container['settings']['paging']['default_page_size'];
         $params = array();
-        $qs = new QueryStringHelper($params, $this->container);
+        $qs = new QueryStringHelper($params, array(), $this->container);
         $this->assertEquals($defaultLimit, $qs->getLimit());
     }
 
@@ -175,7 +176,7 @@ class QueryStringHelperTest extends \Codeception\Test\Unit
         $limit = 999999;
         $maxRecords = (int)$this->container['settings']['paging']['max_records'];
         $params = array('limit' => $limit);
-        $qs = new QueryStringHelper($params, $this->container);
+        $qs = new QueryStringHelper($params, array(), $this->container);
         $this->assertEquals($maxRecords, $qs->getLimit());
     }
 }
