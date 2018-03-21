@@ -26,7 +26,44 @@ class DonorController
 
     public function read(Request $request, Response $response, array $args) 
     {
-        echo 'donor';
+        $id = $args['id'];
+
+        $conn = $this->container->db;
+
+        $qBuilder = $conn->createQueryBuilder();
+
+        $qBuilder
+             ->select(
+                'd.user_id',
+                'u.first_name',
+                'u.last_name',
+                'd.collection_count',
+                'd.item_count',
+                'd.created',
+                'd.modified'
+            )
+            ->from('archive_donor', 'd')
+            ->innerJoin('d', 'accounts_user', 'u', 'd.user_id = u.id')
+            ->where('u.id = :id')
+            ->setParameter('id', $id);
+
+        $stmt = $qBuilder->execute();
+        $result = $stmt->fetch();
+
+        if (!$result) {
+            $error = array(
+                'error' =>
+                array(
+                    'status' => '404',
+                    'message' => 'Requested donor not found',
+                    'detail' => 'Invalid id'
+                )
+            );
+            return $response->withJson($error, 404);
+        }
+        else {
+            return $response->withJson($result);
+        }
     }
 
     public function getDonors(Request $request, Response $response, array $args) 

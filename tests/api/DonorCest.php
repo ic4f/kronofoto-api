@@ -21,15 +21,56 @@ class DonorCest
     {
         $I->wantTo('get data in JSON format');
         $I->sendGET(self::URL); 
-        $I->seeResponseCodeIs(\Codeception\Util\HttpCode::OK); //200
-        $I->seeHttpHeader('Content-type', 'application/json;charset=utf-8');
-        $I->seeResponseIsJson();
+        $this->checkResponseIsValid($I);
+    }
+
+    public function testReadOne(ApiTester $I)
+    {
+        $expectedFields = 7;
+        $I->wantTo("get one record by id");
+        $id = 221;
+        $I->sendGET(self::URL . "/$id"); 
+        $this->checkResponseIsValid($I);
+        $data = $I->grabDataFromResponseByJsonPath('$*');
+        $I->assertEquals($expectedFields, count($data));
+        $I->assertEquals($id, $data[0]);
+        $I->assertEquals('Sergey', $data[1]);
+        $I->assertEquals('Golitsynskiy', $data[2]);
+        $I->assertEquals(0, $data[3]);
+        $I->assertEquals(0, $data[4]);
+        $I->assertEquals('2015-05-28 16:47:40', $data[5]);
+        $I->assertEquals('2015-05-28 16:47:40', $data[6]);
+    }
+
+    public function testReadAnother(ApiTester $I)
+    {
+        $expectedFields = 7;
+        $I->wantTo("get another record by id");
+        $id = 223;
+        $I->sendGET(self::URL . "/$id"); 
+        $this->checkResponseIsValid($I);
+        $data = $I->grabDataFromResponseByJsonPath('$*');
+        $I->assertEquals($expectedFields, count($data));
+        $I->assertEquals($id, $data[0]);
+    }
+
+    public function testReadInvalid(ApiTester $I)
+    {
+        $I->wantTo("see 404 status code and error data");
+        $nonexistantId = 'invalid';
+        $I->sendGET(self::URL . "/$nonexistantId"); 
+        $I->seeResponseCodeIs(\Codeception\Util\HttpCode::NOT_FOUND); //404
+        $data = $I->grabDataFromResponseByJsonPath('$*');
+        $I->assertEquals('404', $data[0]['status']);
+        $I->assertEquals('Requested donor not found', $data[0]['message']);
+        $I->assertEquals('Invalid id', $data[0]['detail']);
     }
 
     public function testDataStructure(ApiTester $I)
     {
         $I->wantTo("check the structure of a record");
         $I->sendGET(self::URL); 
+        $this->checkResponseIsValid($I);
 
         $I->seeResponseMatchesJsonType([
             'user_id' => 'integer',
@@ -48,6 +89,7 @@ class DonorCest
         $expected = 7;
         $I->wantTo("get records with first name starting with $first_name");
         $I->sendGET(self::URL . "?filter[first_name]=$first_name"); 
+        $this->checkResponseIsValid($I);
         $data = $I->grabDataFromResponseByJsonPath('$*');
         $I->assertEquals($expected, count($data));
     }
@@ -58,6 +100,7 @@ class DonorCest
         $expected = 12;
         $I->wantTo("get records with last name starting with $last_name");
         $I->sendGET(self::URL . "?filter[last_name]=$last_name"); 
+        $this->checkResponseIsValid($I);
         $data = $I->grabDataFromResponseByJsonPath('$*');
         $I->assertEquals($expected, count($data));
     }
@@ -70,6 +113,7 @@ class DonorCest
         $I->wantTo("get records with last name starting with $last_name " .  
             "and first name starting with $first_name");
         $I->sendGET(self::URL . "?filter[last_name]=$last_name&filter[first_name]=$first_name"); 
+        $this->checkResponseIsValid($I);
         $data = $I->grabDataFromResponseByJsonPath('$*');
         $I->assertEquals($expected, count($data));
     }
@@ -83,6 +127,7 @@ class DonorCest
         $expected_last_id = 101;
         $I->wantTo("get $limit records starting after record # $offset");
         $I->sendGET(self::URL . "?offset=$offset&limit=$limit"); 
+        $this->checkResponseIsValid($I);
         $data = $I->grabDataFromResponseByJsonPath('$*');
         $I->assertEquals($limit, count($data));
         $I->assertEquals($expected_first_id, $data[0]['user_id']);
@@ -94,6 +139,7 @@ class DonorCest
         $count = (int)$this->container['settings']['paging']['max_records'];
         $I->wantTo("get not more than $count records");
         $I->sendGET(self::URL . "?limit=999999"); 
+        $this->checkResponseIsValid($I);
         $data = $I->grabDataFromResponseByJsonPath('$*');
         $I->assertEquals($count, count($data));
     }
@@ -172,6 +218,13 @@ class DonorCest
 
     /* ------------------- private ----------------------- */
 
+    private function checkResponseIsValid(ApiTester $I)
+    {
+        $I->seeResponseCodeIs(\Codeception\Util\HttpCode::OK); //200
+        $I->seeHttpHeader('Content-type', 'application/json;charset=utf-8');
+        $I->seeResponseIsJson();
+    }
+
     private function testSorted(ApiTester $I, $col, $isDesc)
     {
         $order = $isDesc ? 'descending' : 'ascending';
@@ -179,6 +232,7 @@ class DonorCest
 
         $desc = $isDesc ? '-' : '';
         $I->sendGET(self::URL . "?sort=$desc$col"); 
+        $this->checkResponseIsValid($I);
 
         $data = $I->grabDataFromResponseByJsonPath('$*');
         $this->checkIsSorted($I, $data, $col, $isDesc);

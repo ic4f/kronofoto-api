@@ -1,8 +1,8 @@
 <?php
-////get one record by id
+//get one record by id
 //$app->get('/items/{id}',             'Kronofoto\ItemController:read');
-//$app->get('/donors/{id}',            'Kronofoto\DonorController:read');
-//$app->get('/collections/{id}',       'Kronofoto\CollectionController:read');
+$app->get('/donors/{id}',            'Kronofoto\DonorController:read');
+$app->get('/collections/{id}',       'Kronofoto\CollectionController:read');
 //
 ////all 'get records' queries accecpt optional querystrings
 //

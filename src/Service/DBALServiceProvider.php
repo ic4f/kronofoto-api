@@ -14,7 +14,8 @@ class DBALServiceProvider implements ServiceProviderInterface
             'driver' => 'pdo_mysql',
             'driverOptions' => array( 
                 //to stop ints/floats from being converted to strings
-                \PDO::ATTR_EMULATE_PREPARES => false
+                \PDO::ATTR_EMULATE_PREPARES => false,
+                \PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC
             )
         );
 

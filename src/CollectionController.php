@@ -29,7 +29,50 @@ class CollectionController
 
     public function read(Request $request, Response $response, array $args) 
     {
-        //TODO
+        $id = $args['id'];
+
+        $conn = $this->container->db;
+
+        $qBuilder = $conn->createQueryBuilder();
+
+        $qBuilder
+            ->select(
+                'c.id', 
+                'c.name', 
+                'c.year_min', 
+                'c.year_max', 
+                'c.item_count', 
+                'c.is_published',
+                'c.description',
+                'c.created',
+                'c.modified',
+                'c.featured_item_id',
+                'c.donor_id',
+                'u.first_name as donor_first_name',
+                'u.last_name as donor_last_name'
+            )
+            ->from('archive_collection', 'c')
+            ->innerJoin('c', 'accounts_user', 'u', 'c.donor_id = u.id')
+            ->where('c.id = :id')
+            ->setParameter('id', $id);
+
+        $stmt = $qBuilder->execute();
+        $result = $stmt->fetch();
+
+        if (!$result) {
+            $error = array(
+                'error' =>
+                array(
+                    'status' => '404',
+                    'message' => 'Requested collection not found',
+                    'detail' => 'Invalid id'
+                )
+            );
+            return $response->withJson($error, 404);
+        }
+        else {
+            return $response->withJson($result);
+        }
     }
 
     public function getCollections(Request $request, Response $response, array $args) 

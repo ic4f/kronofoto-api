@@ -21,15 +21,62 @@ class CollectionsCest
     {
         $I->wantTo('get data in JSON format');
         $I->sendGET(self::URL); 
-        $I->seeResponseCodeIs(\Codeception\Util\HttpCode::OK); //200
-        $I->seeHttpHeader('Content-type', 'application/json;charset=utf-8');
-        $I->seeResponseIsJson();
+        $this->checkResponseIsValid($I);
+    }
+
+    public function testReadOne(ApiTester $I)
+    {
+        $expectedFields = 13;
+        $I->wantTo("get one record by id");
+        $id = 10;
+        $I->sendGET(self::URL . "/$id"); 
+        $this->checkResponseIsValid($I);
+        $data = $I->grabDataFromResponseByJsonPath('$*');
+        $I->assertEquals($expectedFields, count($data));
+        $I->assertEquals($id, $data[0]);
+        $I->assertEquals('', $data[1]);
+        $I->assertEquals(1919, $data[2]);
+        $I->assertEquals(1965, $data[3]);
+        $I->assertEquals(39, $data[4]);
+        $I->assertEquals(1, $data[5]);
+        $I->assertEquals('', $data[6]);
+        $I->assertEquals('2015-05-19 13:31:01', $data[7]);
+        $I->assertEquals('2015-05-19 13:31:01', $data[8]);
+        $I->assertEquals('', $data[9]);
+        $I->assertEquals(17, $data[10]);
+        $I->assertEquals('Ardith', $data[11]);
+        $I->assertEquals('Bull', $data[12]);
+    }
+
+    public function testReadAnother(ApiTester $I)
+    {
+        $expectedFields = 13;
+        $I->wantTo("get another record by id");
+        $id = 20;
+        $I->sendGET(self::URL . "/$id"); 
+        $this->checkResponseIsValid($I);
+        $data = $I->grabDataFromResponseByJsonPath('$*');
+        $I->assertEquals($expectedFields, count($data));
+        $I->assertEquals($id, $data[0]);
+    }
+
+    public function testReadInvalid(ApiTester $I)
+    {
+        $I->wantTo("see 404 status code and error data");
+        $nonexistantId = 'invalid';
+        $I->sendGET(self::URL . "/$nonexistantId"); 
+        $I->seeResponseCodeIs(\Codeception\Util\HttpCode::NOT_FOUND); //404
+        $data = $I->grabDataFromResponseByJsonPath('$*');
+        $I->assertEquals('404', $data[0]['status']);
+        $I->assertEquals('Requested collection not found', $data[0]['message']);
+        $I->assertEquals('Invalid id', $data[0]['detail']);
     }
 
     public function testDataStructure(ApiTester $I)
     {
         $I->wantTo("check the structure of a record");
         $I->sendGET(self::URL); 
+        $this->checkResponseIsValid($I);
 
         $I->seeResponseMatchesJsonType([
             'id' => 'integer',
@@ -56,6 +103,7 @@ class CollectionsCest
         $expected_last_id = 60;
         $I->wantTo("get $limit records starting after record # $offset");
         $I->sendGET(self::URL . "?offset=$offset&limit=$limit"); 
+        $this->checkResponseIsValid($I);
         $data = $I->grabDataFromResponseByJsonPath('$*');
         $I->assertEquals($limit, count($data));
         $I->assertEquals($expected_first_id, $data[0]['id']);
@@ -70,6 +118,7 @@ class CollectionsCest
         $count = (int)$this->container['settings']['paging']['max_records'];
         $I->wantTo("get not more than $count records");
         $I->sendGET(self::URL . "?limit=999999"); 
+        $this->checkResponseIsValid($I);
         $data = $I->grabDataFromResponseByJsonPath('$*');
         $I->assertEquals($count, count($data));
     }
@@ -156,6 +205,13 @@ class CollectionsCest
 
     /* ------------------- private ----------------------- */
 
+    private function checkResponseIsValid(ApiTester $I)
+    {
+        $I->seeResponseCodeIs(\Codeception\Util\HttpCode::OK); //200
+        $I->seeHttpHeader('Content-type', 'application/json;charset=utf-8');
+        $I->seeResponseIsJson();
+    }
+
     private function testSorted(ApiTester $I, $col, $isDesc)
     {
         $order = $isDesc ? 'descending' : 'ascending';
@@ -163,6 +219,7 @@ class CollectionsCest
 
         $desc = $isDesc ? '-' : '';
         $I->sendGET(self::URL . "?sort=$desc$col"); 
+        $this->checkResponseIsValid($I);
 
         $data = $I->grabDataFromResponseByJsonPath('$*');
         $this->checkIsSorted($I, $data, $col, $isDesc);
