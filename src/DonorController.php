@@ -53,6 +53,20 @@ class DonorController
 
         $qs = new QueryStringHelper($qParams, self::FIELDS, $this->container);
 
+        //TODO this will need refactoring
+        if ($qs->hasFilterParam()) {
+            $filterParams = $qs->getFilterParams();
+            foreach ($filterParams as $fp) {
+                $field = $fp['field'];
+                $value = $fp['value'];
+                $value .= '%';
+                $qBuilder
+                    ->andWhere(
+                        $qBuilder->expr()->like($field, ":$field"))
+                    ->setParameter($field, "$value");
+            }
+        }
+
         if ($qs->hasSortParam()) {
             $qBuilder
                 ->orderBy($qs->getSortField(), $qs->getSortOrder());

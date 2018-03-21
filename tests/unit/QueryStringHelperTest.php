@@ -14,18 +14,17 @@ class QueryStringHelperTest extends \Codeception\Test\Unit
     }
 
     /* -------------------- test filtering ------------------ */
-    /* TODO: implement for item, not collection.
     public function testHasFilterParam()
     {
         $params = array('a' => 'foo', 'filter' => array());
-        $qs = new QueryStringHelper($params, $this->container);
+        $qs = new QueryStringHelper($params, array(), $this->container);
         $this->assertTrue($qs->hasFilterParam());
     }
 
     public function testHasNoFilterParam()
     {
         $params = array('a' => 'foo');
-        $qs = new QueryStringHelper($params, $this->container);
+        $qs = new QueryStringHelper($params, array(), $this->container);
         $this->assertFalse($qs->hasFilterParam());
     }
 
@@ -33,9 +32,10 @@ class QueryStringHelperTest extends \Codeception\Test\Unit
     {
         $this->expectException(\Exception::class);
 
+        $validFields = ['f1', 'f2', 'f3'];
         $filterArray = array('invalid' => '111');
         $params = array('a' => 'foo', 'filter' => $filterArray);
-        $qs = new QueryStringHelper($params, $this->container);
+        $qs = new QueryStringHelper($params, $validFields, $this->container);
         $qs->getFilterParams();
     }
 
@@ -43,37 +43,25 @@ class QueryStringHelperTest extends \Codeception\Test\Unit
     {
         $this->expectException(\Exception::class);
 
-        $filterArray = array('id' => '');
+        $validFields = ['f1', 'f2', 'f3'];
+        $filterArray = array('f1' => '');
         $params = array('a' => 'foo', 'filter' => $filterArray);
-        $qs = new QueryStringHelper($params, $this->container);
+        $qs = new QueryStringHelper($params, $validFields, $this->container);
         $qs->getFilterParams();
     }
 
     public function testGetFilterParams()
     {
-        $filterArray = array('id' => '111', 'donor_id' => '222');
+        $validFields = ['f1', 'f2', 'f3'];
+        $filterArray = array('f1' => '111', 'f2' => '222');
         $params = array('a' => 'foo', 'filter' => $filterArray);
         $expected = array(
-            ['field' => 'id', 'operator' => '=', 'value' => '111'],
-            ['field' => 'donor_id', 'operator' => '=', 'value' => '222']
+            ['field' => 'f1', 'operator' => '=', 'value' => '111'],
+            ['field' => 'f2', 'operator' => '=', 'value' => '222']
         );
-        $qs = new QueryStringHelper($params, $this->container);
+        $qs = new QueryStringHelper($params, $validFields, $this->container);
         $this->assertEquals($expected, $qs->getFilterParams());
     }
-
-    public function testGetFilterMinMaxParams()
-    {
-        $filterArray = array('id' => '111', 'year_min' => '222', 'year_max' => '333');
-        $params = array('a' => 'foo', 'filter' => $filterArray);
-        $expected = array(
-            ['field' => 'id', 'operator' => '=', 'value' => '111'],
-            ['field' => 'year_min', 'operator' => '<=', 'value' => '222'],
-            ['field' => 'year_max', 'operator' => '>=', 'value' => '333']
-        );
-        $qs = new QueryStringHelper($params, $this->container);
-        $this->assertEquals($expected, $qs->getFilterParams());
-    }
-     */
 
     /* -------------------- test sorting -------------------- */
     public function testHasSortParam()

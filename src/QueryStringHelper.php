@@ -26,7 +26,6 @@ class QueryStringHelper
         $this->container = $container;
     }
 
-    /*
     public function hasFilterParam()
     {
         return array_key_exists(self::FILTER_KEY, $this->params);
@@ -43,13 +42,12 @@ class QueryStringHelper
             $this->validateValue($key, $val);
             $filter = array();
             $filter['field'] = $key;
-            $filter['operator'] = $this->getFilterOperator($key);
+            $filter['operator'] = '=';// $this->getFilterOperator($key);
             $filter['value'] = $val;
             $filterParams[] = $filter;
         }
         return $filterParams;
     }
-     */
 
     public function hasSortParam()
     {
@@ -103,7 +101,6 @@ class QueryStringHelper
             throw new \Exception("$field is not a valid field name");
         }
     }
-/*
     private function validateValue($key, $value)
     {
         if (empty($value)) {
@@ -111,6 +108,7 @@ class QueryStringHelper
         }
     }
 
+/*
     private function getFilterOperator($key)
     {
         //if the key ends with FILTER_SUFFIX_MIN, the operator is <=

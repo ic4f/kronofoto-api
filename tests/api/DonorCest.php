@@ -42,6 +42,38 @@ class DonorCest
         ], '$*');
     }
 
+    public function testFilterByFirstName(ApiTester $I)
+    {
+        $first_name = 'sh';
+        $expected = 7;
+        $I->wantTo("get records with first name starting with $first_name");
+        $I->sendGET(self::URL . "?filter[first_name]=$first_name"); 
+        $data = $I->grabDataFromResponseByJsonPath('$*');
+        $I->assertEquals($expected, count($data));
+    }
+
+    public function testFilterByLastName(ApiTester $I)
+    {
+        $last_name = 'sch';
+        $expected = 12;
+        $I->wantTo("get records with last name starting with $last_name");
+        $I->sendGET(self::URL . "?filter[last_name]=$last_name"); 
+        $data = $I->grabDataFromResponseByJsonPath('$*');
+        $I->assertEquals($expected, count($data));
+    }
+ 
+    public function testFilterByFirstAndLastName(ApiTester $I)
+    {
+        $last_name = 'sch';
+        $first_name = 'm';
+        $expected = 3;
+        $I->wantTo("get records with last name starting with $last_name " .  
+            "and first name starting with $first_name");
+        $I->sendGET(self::URL . "?filter[last_name]=$last_name&filter[first_name]=$first_name"); 
+        $data = $I->grabDataFromResponseByJsonPath('$*');
+        $I->assertEquals($expected, count($data));
+    }
+ 
     public function testPaging(ApiTester $I) 
     {
         $offset = 42;
