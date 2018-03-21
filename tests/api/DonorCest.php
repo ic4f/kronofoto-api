@@ -3,10 +3,10 @@ namespace Kronofoto\Test;
 
 use ApiTester;
 
-class CollectionsCest
+class DonorCest
 {
     //TODO: move these out into a helper class or a config location
-    const URL = '/collections';
+    const URL = '/donors';
 
     private $container; 
 
@@ -32,18 +32,13 @@ class CollectionsCest
         $I->sendGET(self::URL); 
 
         $I->seeResponseMatchesJsonType([
-            'id' => 'integer',
-            'name' => 'string',
-            'year_min' => 'integer|null',
-            'year_max' => 'integer|null',
+            'user_id' => 'integer',
+            'first_name' => 'string',
+            'last_name' => 'string',
+            'collection_count' => 'integer',
             'item_count' => 'integer',
-            'is_published' => 'integer',
             'created' => 'string',
-            'modified' => 'string',
-            'featured_item_id' => 'integer|null',
-            'donor_id' => 'integer',
-            'donor_first_name' => 'string',
-            'donor_last_name' => 'string'
+            'modified' => 'string'
         ], '$*');
     }
 
@@ -51,22 +46,19 @@ class CollectionsCest
     {
         $offset = 42;
         $limit = 10;
-        $sort_by = 'id';
-        $expected_first_id = 51;
-        $expected_last_id = 60;
+        $sort_by = 'user_id';
+        $expected_first_id = 86;
+        $expected_last_id = 101;
         $I->wantTo("get $limit records starting after record # $offset");
         $I->sendGET(self::URL . "?offset=$offset&limit=$limit"); 
         $data = $I->grabDataFromResponseByJsonPath('$*');
         $I->assertEquals($limit, count($data));
-        $I->assertEquals($expected_first_id, $data[0]['id']);
-        $I->assertEquals($expected_last_id, $data[$limit-1]['id']);
+        $I->assertEquals($expected_first_id, $data[0]['user_id']);
+        $I->assertEquals($expected_last_id, $data[$limit-1]['user_id']);
     }
 
     public function testMaxRecordCount(ApiTester $I)
     {
-        //this will work ONLY if there is a limit param:
-        //max_records is NOT the default page size - it's a guard against
-        //a page that is too large.
         $count = (int)$this->container['settings']['paging']['max_records'];
         $I->wantTo("get not more than $count records");
         $I->sendGET(self::URL . "?limit=999999"); 
@@ -74,24 +66,44 @@ class CollectionsCest
         $I->assertEquals($count, count($data));
     }
 
-    public function testSortedYearMinAcs(ApiTester $I) 
+    public function testSortedUserIdAcs(ApiTester $I) 
     {
-        $this->testSorted($I, 'year_min', false);
+        $this->testSorted($I, 'user_id', false);
     }
 
-    public function testSortedYearMinDesc(ApiTester $I) 
+    public function testSortedUserIdDecs(ApiTester $I) 
     {
-        $this->testSorted($I, 'year_min', true);
+        $this->testSorted($I, 'user_id', true);
     }
 
-    public function testSortedYearMaxAcs(ApiTester $I) 
+    public function testSortedFirstNameAcs(ApiTester $I) 
     {
-        $this->testSorted($I, 'year_max', false);
+        $this->testSorted($I, 'first_name', false);
     }
 
-    public function testSortedYearMaxDesc(ApiTester $I) 
+    public function testSortedFirstNameDecs(ApiTester $I) 
     {
-        $this->testSorted($I, 'year_max', true);
+        $this->testSorted($I, 'first_name', true);
+    }
+
+    public function testSortedLastNameAcs(ApiTester $I) 
+    {
+        $this->testSorted($I, 'last_name', false);
+    }
+
+    public function testSortedLastNameDecs(ApiTester $I) 
+    {
+        $this->testSorted($I, 'last_name', true);
+    }
+
+    public function testSortedCollectionCountAcs(ApiTester $I) 
+    {
+        $this->testSorted($I, 'collection_count', false);
+    }
+
+    public function testSortedCollectionCountDesc(ApiTester $I) 
+    {
+        $this->testSorted($I, 'collection_count', true);
     }
 
     public function testSortedItemCountAcs(ApiTester $I) 
@@ -102,16 +114,6 @@ class CollectionsCest
     public function testSortedItemCountDesc(ApiTester $I) 
     {
         $this->testSorted($I, 'item_count', true);
-    }
-
-    public function testSortedIsPublishedAcs(ApiTester $I) 
-    {
-        $this->testSorted($I, 'is_published', false);
-    }
-
-    public function testSortedIsPublishedDesc(ApiTester $I) 
-    {
-        $this->testSorted($I, 'is_published', true);
     }
 
     public function testSortedCreatedAcs(ApiTester $I) 
@@ -134,25 +136,7 @@ class CollectionsCest
         $this->testSorted($I, 'modified', true);
     }
 
-    public function testSortedDonorIdAcs(ApiTester $I) 
-    {
-        $this->testSorted($I, 'donor_id', false);
-    }
 
-    public function testSortedDonorIdDesc(ApiTester $I) 
-    {
-        $this->testSorted($I, 'donor_id', true);
-    }
-
-    public function testSortedFeaturedItemIdAcs(ApiTester $I) 
-    {
-        $this->testSorted($I, 'featured_item_id', false);
-    }
-
-    public function testSortedFeaturedItemIdDesc(ApiTester $I) 
-    {
-        $this->testSorted($I, 'featured_item_id', true);
-    }
 
     /* ------------------- private ----------------------- */
 
@@ -183,3 +167,4 @@ class CollectionsCest
         }
     }
 }
+

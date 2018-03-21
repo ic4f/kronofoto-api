@@ -11,9 +11,9 @@
 //$app->get('/donors/{id}/items',       'Kronofoto\ItemController:getDonorItems');
 //$app->get('/collections/{id}/items',  'Kronofoto\ItemController:getCollectionItems');
 //
-////donors
-//$app->get('/donors',                  'Kronofoto\DonorController:getDonors');
-//
-////collections
+//donors
+$app->get('/donors',                  'Kronofoto\DonorController:getDonors');
+
+//collections
 $app->get('/collections',             'Kronofoto\CollectionController:getCollections');
 //$app->get('/donors/{id}/collections', 'Kronofoto\CollectionController:getDonorCollections');
