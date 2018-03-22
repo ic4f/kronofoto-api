@@ -3,63 +3,113 @@ namespace Kronofoto;
 
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
-
 use Interop\Container\ContainerInterface;
 
 class ItemController 
 {
+    const FIELDS = [
+        'id',
+        'identifier',
+        'collection_id',
+        'latitude',
+        'longitude',
+        'year_min',
+        'year_max',
+        'is_published',
+        'created', 
+        'modified' 
+    ];
+
     protected $container;
-    private $test42;
 
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
-        $this->test42 = 'abra';
     }
-    //this must return an http json response containing an item...
-    //
-    //
-    //
+
     public function read(Request $request, Response $response, array $args) 
     {
-        //args  must contain a valid identifier (accession number?)
-        //
-
-        //get accession number
         $id = $args['id'];
 
-        //get config vals
+        $conn = $this->container->db;
 
-        $db = $this->container->db1;
-        $sql = "select * from archive_photo where id = 2";
-        $stmt = $db->prepare($sql);
-        $stmt->execute();
+        $qBuilder = $conn->createQueryBuilder();
+
+        $qBuilder
+             ->select(
+                'i.id',
+                'i.identifier',
+                'i.collection_id',
+                'i.latitude',
+                'i.longitude',
+                'i.year_min',
+                'i.year_max',
+                'i.is_published',
+                'i.created',
+                'i.modified'
+            )
+            ->from('archive_item', 'i')
+            ->where('i.id = :id')
+            ->setParameter('id', $id);
+
+        $stmt = $qBuilder->execute();
         $result = $stmt->fetch();
-        $result = print_r($result);
 
-        //call db
-       // $item = $db->getItem($id);
-
-        //arrange json
-        //$result = json_encode($item);
-        
-        //send json as the http response
-
-        
-
-
-
-        $response->getBody()->write($result);
-        return $response;
+        if (!$result) {
+            $error = array(
+                'error' =>
+                array(
+                    'status' => '404',
+                    'message' => 'Requested item not found',
+                    'detail' => 'Invalid id'
+                )
+            );
+            return $response->withJson($error, 404);
+        }
+        else {
+            return $response->withJson($result);
+        }
     }
 
-    public function getItems(Request $request, Response $response, array $args)
+    public function getItems(Request $request, Response $response, array $args) 
     {
-        //args may be empty, or may contain query string
-        //if args not enmpty, must process query string first
-        //include additional info about recordset into json.
+        $conn = $this->container->db;
 
-        echo 'items';
+        $qBuilder = $conn->createQueryBuilder();
+
+        $qParams = $request->getQueryParams();
+
+        $qBuilder
+            ->select(
+                'i.id',
+                'i.identifier',
+                'i.collection_id',
+                'i.latitude',
+                'i.longitude',
+                'i.year_min',
+                'i.year_max',
+                'i.is_published',
+                'i.created',
+                'i.modified'
+            )
+            ->from('archive_item', 'i')
+            ->where('1 = 1'); 
+
+        $qs = new QueryStringHelper($qParams, self::FIELDS, $this->container);
+
+        if ($qs->hasSortParam()) {
+            $qBuilder
+                ->orderBy($qs->getSortField(), $qs->getSortOrder());
+        }
+
+        $qBuilder
+            ->setFirstResult($qs->getOffset())
+            ->setMaxResults($qs->getLimit());
+
+        $stmt = $qBuilder->execute();
+        $result = $stmt->fetchAll();
+
+        return $response->withJson($result);
     }
 
     public function getDonorItems(Request $request, Response $response, array $args)
