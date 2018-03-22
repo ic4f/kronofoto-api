@@ -8,7 +8,6 @@ class DonorModelTest extends \Codeception\Test\Unit
     public function testValidateSortCriteria()
     {
         $model = new DonorModel();
-
         $this->assertTrue($model->validateSort('user_id')); 
         $this->assertTrue($model->validateSort('first_name')); 
         $this->assertTrue($model->validateSort('last_name')); 
@@ -20,13 +19,22 @@ class DonorModelTest extends \Codeception\Test\Unit
 
     public function testValidateBadSortCriteria()
     {
-        $model = new DonorModel();
-
         $this->expectException(\Exception::class);
-
+        $model = new DonorModel();
         $model->validateSort('invalid'); 
     }
 
+    public function testValidateFilterCriteria()
+    {
+        $model = new DonorModel();
+        $this->assertTrue($model->validateFilter('first_name')); 
+        $this->assertTrue($model->validateFilter('last_name')); 
+    }
 
-
+    public function testValidateBadFilterCriteria()
+    {
+        $this->expectException(\Exception::class);
+        $model = new DonorModel();
+        $this->assertTrue($model->validateFilter('invalid')); 
+    }
 }

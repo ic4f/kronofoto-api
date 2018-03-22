@@ -1,7 +1,7 @@
 <?php
 namespace Kronofoto\Models;
 
-class DonorModel extends Model
+class ItemModel extends Model
 {
     public function validateSort($criteria)
     {
@@ -22,11 +22,13 @@ class DonorModel extends Model
     protected function getSortCriteria() 
     {
         return [
-            'user_id', 
-            'first_name',
-            'last_name',
-            'collection_count',
-            'item_count',
+            'id',
+            'identifier',
+            'collection_id',
+            'latitude',
+            'longitude',
+            'year_min',
+            'year_max',
             'created',
             'modified'
         ];
@@ -35,8 +37,11 @@ class DonorModel extends Model
     protected function getFilterCriteria() 
     {
         return [
-            'first_name',
-            'last_name'
+            'identifier',
+            'year',
+            'before',
+            'after'
         ];
     }
 }
+

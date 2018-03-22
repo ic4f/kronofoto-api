@@ -5,5 +5,5 @@ abstract class Model
 {
     public abstract function validateSort($criteria);
 
-    public abstract function validateFilter();
+    public abstract function validateFilter($criteria);
 }

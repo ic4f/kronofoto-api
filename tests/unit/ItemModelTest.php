@@ -1,0 +1,46 @@
+<?php
+namespace Kronofoto\Test;
+
+use Kronofoto\Models\ItemModel;
+
+class ItemModelTest extends \Codeception\Test\Unit
+{
+    public function testValidateSortCriteria()
+    {
+        $model = new ItemModel();
+        $this->assertTrue($model->validateSort('id'));
+        $this->assertTrue($model->validateSort('identifier'));
+        $this->assertTrue($model->validateSort('collection_id'));
+        $this->assertTrue($model->validateSort('latitude'));
+        $this->assertTrue($model->validateSort('longitude'));
+        $this->assertTrue($model->validateSort('year_min'));
+        $this->assertTrue($model->validateSort('year_max'));
+        $this->assertTrue($model->validateSort('created')); 
+        $this->assertTrue($model->validateSort('modified'));
+    }
+
+
+    public function testValidateBadSortCriteria()
+    {
+        $this->expectException(\Exception::class);
+        $model = new ItemModel();
+        $model->validateSort('invalid'); 
+    }
+
+    public function testValidateFilterCriteria()
+    {
+        $model = new ItemModel();
+        $this->assertTrue($model->validateFilter('identifier')); 
+        $this->assertTrue($model->validateFilter('year')); 
+        $this->assertTrue($model->validateFilter('before')); 
+        $this->assertTrue($model->validateFilter('after')); 
+    }
+
+    public function testValidateBadFilterCriteria()
+    {
+        $this->expectException(\Exception::class);
+        $model = new ItemModel();
+        $this->assertTrue($model->validateFilter('invalid')); 
+    }
+}
+
