@@ -2,6 +2,8 @@
 namespace Kronofoto\Test;
 
 use Kronofoto\QueryStringHelper;
+use Kronofoto\Models\Model;
+
 
 class QueryStringHelperTest extends \Codeception\Test\Unit
 {
@@ -17,14 +19,16 @@ class QueryStringHelperTest extends \Codeception\Test\Unit
     public function testHasFilterParam()
     {
         $params = array('a' => 'foo', 'filter' => array());
-        $qs = new QueryStringHelper($params, array(), $this->container);
+        $model = $this->getMockModel();
+        $qs = new QueryStringHelper($params, $model, $this->container);
         $this->assertTrue($qs->hasFilterParam());
     }
 
     public function testHasNoFilterParam()
     {
         $params = array('a' => 'foo');
-        $qs = new QueryStringHelper($params, array(), $this->container);
+        $model = $this->getMockModel();
+        $qs = new QueryStringHelper($params, $model, $this->container);
         $this->assertFalse($qs->hasFilterParam());
     }
 
@@ -32,10 +36,11 @@ class QueryStringHelperTest extends \Codeception\Test\Unit
     {
         $this->expectException(\Exception::class);
 
-        $validFields = ['f1', 'f2', 'f3'];
         $filterArray = array('invalid' => '111');
         $params = array('a' => 'foo', 'filter' => $filterArray);
-        $qs = new QueryStringHelper($params, $validFields, $this->container);
+        $model = $this->getMockModel();
+        $model->method('validateFilter')->will($this->throwException(new \Exception));
+        $qs = new QueryStringHelper($params, $model, $this->container);
         $qs->getFilterParams();
     }
 
@@ -43,77 +48,86 @@ class QueryStringHelperTest extends \Codeception\Test\Unit
     {
         $this->expectException(\Exception::class);
 
-        $validFields = ['f1', 'f2', 'f3'];
         $filterArray = array('f1' => '');
         $params = array('a' => 'foo', 'filter' => $filterArray);
-        $qs = new QueryStringHelper($params, $validFields, $this->container);
+        $model = $this->getMockModel();
+        $qs = new QueryStringHelper($params, $model, $this->container);
         $qs->getFilterParams();
     }
 
     public function testGetFilterParams()
     {
-        $validFields = ['f1', 'f2', 'f3'];
         $filterArray = array('f1' => '111', 'f2' => '222');
         $params = array('a' => 'foo', 'filter' => $filterArray);
+        $model = $this->getMockModel();
         $expected = array(
-            ['field' => 'f1', 'operator' => '=', 'value' => '111'],
-            ['field' => 'f2', 'operator' => '=', 'value' => '222']
+            ['key' => 'f1', 'operator' => '=', 'value' => '111'],
+            ['key' => 'f2', 'operator' => '=', 'value' => '222']
         );
-        $qs = new QueryStringHelper($params, $validFields, $this->container);
+        $qs = new QueryStringHelper($params, $model, $this->container);
         $this->assertEquals($expected, $qs->getFilterParams());
     }
 
-    /* -------------------- test sorting -------------------- */
+/* -------------------- test sorting -------------------- */
+    
     public function testHasSortParam()
     {
         $params = array('a' => 'foo', 'sort' => 'id');
-        $qs = new QueryStringHelper($params, array(), $this->container);
+        $model = $this->getMockModel();
+        $qs = new QueryStringHelper($params, $model, $this->container);
         $this->assertTrue($qs->hasSortParam());
     }
 
     public function testHasNoSortParam()
     {
         $params = array('a' => 'foo', 'b' => 'bar');
-        $qs = new QueryStringHelper($params, array(), $this->container);
+        $model = $this->getMockModel();
+        $qs = new QueryStringHelper($params, $model, $this->container);
         $this->assertFalse($qs->hasSortParam());
     }
 
     public function testGetSortField()
     {
         $sortField = 'id';
-        $params = array('a' => 'foo', 'sort' => $sortField);
-        $qs = new QueryStringHelper($params, array($sortField), $this->container);
+        $params = array('a' => 'foo', 'sort' => $sortField); 
+        $model = $this->getMockModel();
+        $qs = new QueryStringHelper($params, $model, $this->container);
         $this->assertEquals($sortField, $qs->getSortField());
     }
 
-    public function testGetSortFieldWithoutDescendingOrder()
+    public function testGetSortFieldWithoutDescendingOperator()
     {
         $sortField = 'id';
         $params = array('a' => 'foo', 'sort' => '-' . $sortField);
-        $qs = new QueryStringHelper($params, array($sortField), $this->container);
+        $model = $this->getMockModel();
+        $qs = new QueryStringHelper($params, $model, $this->container);
         $this->assertEquals($sortField, $qs->getSortField());
     }
 
     public function testGetAcsendingSortOrder()
     {
         $params = array('a' => 'foo', 'sort' => 'id');
-        $qs = new QueryStringHelper($params, array(), $this->container);
+        $model = $this->getMockModel();
+        $qs = new QueryStringHelper($params, $model, $this->container);
         $this->assertEquals('ASC', $qs->getSortOrder());
     }
 
     public function testGetDecsendingSortOrder()
     {
         $params = array('a' => 'foo', 'sort' => '-id');
-        $qs = new QueryStringHelper($params, array(), $this->container);
+        $model = $this->getMockModel();
+        $qs = new QueryStringHelper($params, $model, $this->container);
         $this->assertEquals('DESC', $qs->getSortOrder());
     }
-
+ 
     public function testSortFieldInvalid()
     {
         $this->expectException(\Exception::class);
 
         $params = array('a' => 'foo', 'sort' => 'invalid');
-        $qs = new QueryStringHelper($params, array(), $this->container);
+        $model = $this->getMockModel();
+        $model->method('validateSort')->will($this->throwException(new \Exception));
+        $qs = new QueryStringHelper($params, $model, $this->container);
         $qs->getSortField();
     }
 
@@ -122,24 +136,26 @@ class QueryStringHelperTest extends \Codeception\Test\Unit
         $this->expectException(\Exception::class);
 
         $params = array('a' => 'foo', 'sort' => '');
-        $qs = new QueryStringHelper($params, array(), $this->container);
+        $model = $this->getMockModel();
+        $qs = new QueryStringHelper($params, $model, $this->container);
         $qs->getSortField();
     }
 
-    /* -------------------- test paging -------------------- */
-    
+/* -------------------- test paging -------------------- */
     public function testGetOffset()
     {
         $offset = 12;
         $params = array('offset' => $offset);
-        $qs = new QueryStringHelper($params, array(), $this->container);
+        $model = $this->getMockModel();
+        $qs = new QueryStringHelper($params, $model, $this->container);
         $this->assertEquals($offset, $qs->getOffset());
     }
 
     public function testGetDefaultOffset()
     {
         $params = array();
-        $qs = new QueryStringHelper($params, array(), $this->container);
+        $model = $this->getMockModel();
+        $qs = new QueryStringHelper($params, $model, $this->container);
         $this->assertEquals(0, $qs->getOffset());
     }
 
@@ -147,7 +163,8 @@ class QueryStringHelperTest extends \Codeception\Test\Unit
     {
         $limit = 17;
         $params = array('limit' => $limit);
-        $qs = new QueryStringHelper($params, array(), $this->container);
+        $model = $this->getMockModel();
+        $qs = new QueryStringHelper($params, $model, $this->container);
         $this->assertEquals($limit, $qs->getLimit());
     }
 
@@ -155,7 +172,8 @@ class QueryStringHelperTest extends \Codeception\Test\Unit
     {
         $defaultLimit = (int)$this->container['settings']['paging']['default_page_size'];
         $params = array();
-        $qs = new QueryStringHelper($params, array(), $this->container);
+        $model = $this->getMockModel();
+        $qs = new QueryStringHelper($params, $model, $this->container);
         $this->assertEquals($defaultLimit, $qs->getLimit());
     }
 
@@ -164,7 +182,13 @@ class QueryStringHelperTest extends \Codeception\Test\Unit
         $limit = 999999;
         $maxRecords = (int)$this->container['settings']['paging']['max_records'];
         $params = array('limit' => $limit);
-        $qs = new QueryStringHelper($params, array(), $this->container);
+        $model = $this->getMockModel();
+        $qs = new QueryStringHelper($params, $model, $this->container);
         $this->assertEquals($maxRecords, $qs->getLimit());
+    }
+
+    private function getMockModel()
+    {
+        return $this->createMock(Model::class);
     }
 }

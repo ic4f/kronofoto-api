@@ -104,12 +104,12 @@ class DonorCest
         $data = $I->grabDataFromResponseByJsonPath('$*');
         $I->assertEquals($expected, count($data));
     }
- 
+
     public function testFilterByFirstAndLastName(ApiTester $I)
     {
-        $last_name = 'sch';
         $first_name = 'm';
-        $expected = 3;
+        $last_name = 's';
+        $expected = 5;
         $I->wantTo("get records with last name starting with $last_name " .  
             "and first name starting with $first_name");
         $I->sendGET(self::URL . "?filter[last_name]=$last_name&filter[first_name]=$first_name"); 

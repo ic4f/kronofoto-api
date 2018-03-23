@@ -68,7 +68,7 @@ class ItemCest
         $I->assertEquals('Requested item not found', $data[0]['message']);
         $I->assertEquals('Invalid id', $data[0]['detail']);
     }
- 
+
     public function testDataStructure(ApiTester $I)
     {
         $I->wantTo("check the structure of a record");
@@ -89,13 +89,81 @@ class ItemCest
         ], '$*');
     }
 
+    public function testFilterByIdentifier(ApiTester $I)
+    {
+        $identifier = 'FI00429';
+        $expected = 10;
+        $I->wantTo("get records with identifier starting with $identifier" );
+        $I->sendGET(self::URL . "?filter[identifier]=$identifier"); 
+        $this->checkResponseIsValid($I);
+        $data = $I->grabDataFromResponseByJsonPath('$*');
+        $I->assertEquals($expected, count($data));
+    }
+
+    public function testFilterByCollectionId(ApiTester $I)
+    {
+        $collection_id = 36;
+        $expected = 5;
+        $I->wantTo("get records with collection_id: $collection_id" );
+        $I->sendGET(self::URL . "?filter[collection_id]=$collection_id"); 
+        $this->checkResponseIsValid($I);
+        $data = $I->grabDataFromResponseByJsonPath('$*');
+        $I->assertEquals($expected, count($data));
+    }
+
+    public function testFilterGetItemsBeforeYear(ApiTester $I)
+    {
+        $year = 1870;
+        $expected = 16;
+        $I->wantTo("get items dated $year or earlier");
+        $I->sendGET(self::URL . "?filter[before]=$year"); 
+        $this->checkResponseIsValid($I);
+        $data = $I->grabDataFromResponseByJsonPath('$*');
+        $I->assertEquals($expected, count($data));
+    }
+/*
+    public function testFilterGetItemsAfterYear(ApiTester $I)
+    {
+        $year = 1999;
+        $expected = 28;
+        $I->wantTo("get items dated $year or later");
+        //add limit param to retrieve more than default
+        $I->sendGET(self::URL . "?limit=100&filter[year_max]=$year"); 
+        $this->checkResponseIsValid($I);
+        $data = $I->grabDataFromResponseByJsonPath('$*');
+        $I->assertEquals($expected, count($data));
+    }
+
+    public function testFilterGetItemsBetweenYears(ApiTester $I)
+    {
+        $year1 = 1901;
+        $year2 = 1903;
+        $expected = 11;
+        $I->wantTo("get items dated between $year1 and $year2");
+        $I->sendGET(self::URL . "?filter[year_min]=$year2&filter[year_max]=$year1"); 
+        $this->checkResponseIsValid($I);
+        $data = $I->grabDataFromResponseByJsonPath('$*');
+        $I->assertEquals($expected, count($data));
+    }
+
+    public function testFilterGetItemsForYear(ApiTester $I)
+    {
+        $year = 1901;
+        $expected = 3;
+        $I->wantTo("get items dated $year");
+        $I->sendGET(self::URL . "?filter[year_min]=$year&filter[year_max]=$year"); 
+        $this->checkResponseIsValid($I);
+        $data = $I->grabDataFromResponseByJsonPath('$*');
+        $I->assertEquals($expected, count($data));
+    }
+ */ 
     public function testPaging(ApiTester $I) 
     {
         $offset = 42;
         $limit = 10;
         $sort_by = 'id';
-        $expected_first_id = 43;
-        $expected_last_id = 52;
+        $expected_first_id = 47;
+        $expected_last_id = 56;
         $I->wantTo("get $limit records starting after record # $offset");
         $I->sendGET(self::URL . "?offset=$offset&limit=$limit"); 
         $this->checkResponseIsValid($I);

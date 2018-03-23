@@ -2,6 +2,8 @@
 
 namespace Kronofoto;
 
+use Kronofoto\Models\Model;
+
 use Interop\Container\ContainerInterface;
 
 class QueryStringHelper
@@ -16,13 +18,13 @@ class QueryStringHelper
     const FILTER_SUFFIX_MAX = '_max';
 
     private $params;
-    private $fields;
+    private $model;
     private $container;
 
-    public function __construct(array $params, array $fields, ContainerInterface $container)
+    public function __construct(array $params, Model $model, ContainerInterface $container)
     {
         $this->params = $params;
-        $this->fields = $fields;
+        $this->model = $model;
         $this->container = $container;
     }
 
@@ -33,16 +35,15 @@ class QueryStringHelper
 
     public function getFilterParams()
     {
-        //get the filter subarray
         $filterArray = $this->params[self::FILTER_KEY];
-        //costruct the parameters
         $filterParams = array();
         foreach ($filterArray as $key=>$val) {
-            $this->validateField($key);
+            $this->model->validateFilter($key);
             $this->validateValue($key, $val);
             $filter = array();
-            $filter['field'] = $key;
-            $filter['operator'] = '=';// $this->getFilterOperator($key);
+            $filter['key'] = $key;
+            //TODO operator can vary...
+            $filter['operator'] = '=';
             $filter['value'] = $val;
             $filterParams[] = $filter;
         }
@@ -65,7 +66,7 @@ class QueryStringHelper
         if ($sort[0] === '-') {
             $sort = substr($sort, 1);
         }
-        $this->validateField($sort);
+        $this->model->validateSort($sort);
         return $sort;
     }
 
@@ -93,41 +94,10 @@ class QueryStringHelper
         return (int)$this->container['settings']['paging']['default_page_size'];
     }
 
-
-    //TODO refactor of course!!
-    private function validateField($field)
-    {
-        if (!in_array($field, $this->fields)) {
-            throw new \Exception("$field is not a valid field name");
-        }
-    }
     private function validateValue($key, $value)
     {
         if (empty($value)) {
             throw new \Exception("Value for $key cannot be empty");
         }
     }
-
-/*
-    private function getFilterOperator($key)
-    {
-        //if the key ends with FILTER_SUFFIX_MIN, the operator is <=
-        $lenMin = strlen(self::FILTER_SUFFIX_MIN);
-        if (strlen($key) > $lenMin) {
-            if (substr_compare($key, self::FILTER_SUFFIX_MIN, -$lenMin) === 0) {
-                return '<=';
-            }
-        }
-        //if the key ends with FILTER_SUFFIX_MAX, the operator is >=
-        $lenMax = strlen(self::FILTER_SUFFIX_MAX);
-        if (strlen($key) > $lenMax) {
-            if (substr_compare($key, self::FILTER_SUFFIX_MAX, -$lenMax) === 0) {
-                //the key ends with FILTER_SUFFIX_MIN
-                return '>=';
-            }
-        }
-        //in all other cases, the operator is =
-        return '=';
-    }
- */
 }
