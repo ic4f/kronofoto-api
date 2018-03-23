@@ -3,7 +3,23 @@ namespace Kronofoto\Models;
 
 abstract class Model
 {
-    public abstract function validateSort($criteria);
+    public function validateSort($criteria)
+    {
+        if (!in_array($criteria, $this->getSortCriteria())) {
+            throw new \Exception('Invalid sort criteria');
+        }
+        return true;
+    }
 
-    public abstract function validateFilter($criteria);
+    public function validateFilter($criteria)
+    {
+        if (!in_array($criteria, $this->getFilterCriteria())) {
+            throw new \Exception('Invalid filter criteria');
+        }
+        return true;
+    }
+
+    protected abstract function getSortCriteria();
+
+    protected abstract function getFilterCriteria();
 }
