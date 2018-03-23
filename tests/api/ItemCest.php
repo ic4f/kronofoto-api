@@ -1,35 +1,44 @@
 <?php
 namespace Kronofoto\Test;
 
+require_once 'ControllerCest.php';
+
 use ApiTester;
+use Kronofoto\Controllers\CollectionController;
 
-class ItemCest
+class ItemCest extends ControllerCest
 {
-    //TODO: move these out into a helper class or a config location
-    const URL = '/items';
+    /* ----------- required overrides ----------- */
 
-    private $container; 
-
-    public function _before(ApiTester $I)
+    protected function getURL()
     {
-        $app = require dirname(dirname(__DIR__)) . '/config/bootstrap.php';
-        $this->container = $app->getContainer();
+        return '/items';
     }
 
-    //all records are published (is_published = 1), unless noted otherwise
-    public function testResponseIsJson(ApiTester $I)
+    protected function getListDataStructure()
     {
-        $I->wantTo('get data in JSON format');
-        $I->sendGET(self::URL); 
-        $this->checkResponseIsValid($I);
+        return [
+            'id' => 'integer',
+            'identifier' => 'string',
+            'collection_id' => 'integer',
+            'latitude' => 'integer|float',
+            'longitude' => 'integer|float',
+            'year_min' => 'integer|null',
+            'year_max' => 'integer|null',
+            'is_published' => 'integer',
+            'created' => 'string',
+            'modified' => 'string',
+        ];
     }
+
+    /* --------------- tests for one record ---------------- */
 
     public function testReadOne(ApiTester $I)
     {
         $expectedFields = 10;
         $I->wantTo("get one record by id");
         $id = 10;
-        $I->sendGET(self::URL . "/$id"); 
+        $I->sendGET($this->getURL() . "/$id"); 
         $this->checkResponseIsValid($I);
         $data = $I->grabDataFromResponseByJsonPath('$*');
         $I->assertEquals($expectedFields, count($data));
@@ -47,67 +56,31 @@ class ItemCest
 
     public function testReadAnother(ApiTester $I)
     {
-        $expectedFields = 10;
-        $I->wantTo("get another record by id");
-        $id = 20;
-        $I->sendGET(self::URL . "/$id"); 
-        $this->checkResponseIsValid($I);
-        $data = $I->grabDataFromResponseByJsonPath('$*');
-        $I->assertEquals($expectedFields, count($data));
-        $I->assertEquals($id, $data[0]);
+        $this->runTestReadAnother($I, 20, 10);
     }
 
     public function testReadInvalid(ApiTester $I)
-    {
-        $I->wantTo("see 404 status code and error data");
-        $nonexistantId = 'invalid';
-        $I->sendGET(self::URL . "/$nonexistantId"); 
-        $I->seeResponseCodeIs(\Codeception\Util\HttpCode::NOT_FOUND); //404
-        $data = $I->grabDataFromResponseByJsonPath('$*');
-        $I->assertEquals('404', $data[0]['status']);
-        $I->assertEquals('Requested item not found', $data[0]['message']);
-        $I->assertEquals('Invalid id', $data[0]['detail']);
+    { 
+        $this->runTestReadInvalid($I, 'item', 'id');
     }
 
-    public function testDataStructure(ApiTester $I)
-    {
-        $I->wantTo("check the structure of a record");
-        $I->sendGET(self::URL); 
-        $this->checkResponseIsValid($I);
-
-        $I->seeResponseMatchesJsonType([
-            'id' => 'integer',
-            'identifier' => 'string',
-            'collection_id' => 'integer',
-            'latitude' => 'integer|float',
-            'longitude' => 'integer|float',
-            'year_min' => 'integer|null',
-            'year_max' => 'integer|null',
-            'is_published' => 'integer',
-            'created' => 'string',
-            'modified' => 'string',
-        ], '$*');
-    }
+    /* --------------- tests for lists of records ---------------- */
 
     public function testFilterByIdentifier(ApiTester $I)
     {
         $identifier = 'FI00429';
         $expected = 10;
         $I->wantTo("get records with identifier starting with $identifier" );
-        $I->sendGET(self::URL . "?filter[identifier]=$identifier"); 
-        $this->checkResponseIsValid($I);
-        $data = $I->grabDataFromResponseByJsonPath('$*');
-        $I->assertEquals($expected, count($data));
+        $I->sendGET($this->getURL() . "?filter[identifier]=$identifier"); 
+        $this->checkValidAndNumberOfRecords($I, $expected);
     }
     public function testFilterGetItemsBeforeYear(ApiTester $I)
     {
         $year = 1870;
         $expected = 16;
         $I->wantTo("get items dated $year or earlier");
-        $I->sendGET(self::URL . "?filter[before]=$year"); 
-        $this->checkResponseIsValid($I);
-        $data = $I->grabDataFromResponseByJsonPath('$*');
-        $I->assertEquals($expected, count($data));
+        $I->sendGET($this->getURL() . "?filter[before]=$year"); 
+        $this->checkValidAndNumberOfRecords($I, $expected);
     }
 
     public function testFilterGetItemsAfterYear(ApiTester $I)
@@ -116,10 +89,8 @@ class ItemCest
         $expected = 28;
         $I->wantTo("get items dated $year or later");
         //add limit param to retrieve more than default
-        $I->sendGET(self::URL . "?limit=100&filter[after]=$year"); 
-        $this->checkResponseIsValid($I);
-        $data = $I->grabDataFromResponseByJsonPath('$*');
-        $I->assertEquals($expected, count($data));
+        $I->sendGET($this->getURL() . "?limit=100&filter[after]=$year"); 
+        $this->checkValidAndNumberOfRecords($I, $expected);
     }
 
     public function testFilterGetItemsBetweenYears(ApiTester $I)
@@ -128,10 +99,8 @@ class ItemCest
         $year2 = 1903;
         $expected = 10;
         $I->wantTo("get items dated between $year1 and $year2");
-        $I->sendGET(self::URL . "?filter[after]=$year1&filter[before]=$year2"); 
-        $this->checkResponseIsValid($I);
-        $data = $I->grabDataFromResponseByJsonPath('$*');
-        $I->assertEquals($expected, count($data));
+        $I->sendGET($this->getURL() . "?filter[after]=$year1&filter[before]=$year2"); 
+        $this->checkValidAndNumberOfRecords($I, $expected);
     }
 
     public function testFilterGetItemsForYear(ApiTester $I)
@@ -139,166 +108,101 @@ class ItemCest
         $year = 1901;
         $expected = 3;
         $I->wantTo("get items dated $year");
-        $I->sendGET(self::URL . "?filter[year]=$year"); 
-        $this->checkResponseIsValid($I);
-        $data = $I->grabDataFromResponseByJsonPath('$*');
-        $I->assertEquals($expected, count($data));
+        $I->sendGET($this->getURL() . "?filter[year]=$year"); 
+        $this->checkValidAndNumberOfRecords($I, $expected);
     }
-  
     
     public function testPaging(ApiTester $I) 
     {
-        $offset = 42;
-        $limit = 10;
-        $sort_by = 'id';
-        $expected_first_id = 47;
-        $expected_last_id = 56;
-        $I->wantTo("get $limit records starting after record # $offset");
-        $I->sendGET(self::URL . "?offset=$offset&limit=$limit"); 
-        $this->checkResponseIsValid($I);
-        $data = $I->grabDataFromResponseByJsonPath('$*');
-        $I->assertEquals($limit, count($data));
-        $I->assertEquals($expected_first_id, $data[0]['id']);
-        $I->assertEquals($expected_last_id, $data[$limit-1]['id']);
+        $this->runTestPaging($I, 42, 10, 'id', 47, 56);
     }
 
-    public function testMaxRecordCount(ApiTester $I)
+    public function runTestSortIdAcs(ApiTester $I) 
     {
-        $count = (int)$this->container['settings']['paging']['max_records'];
-        $I->wantTo("get not more than $count records");
-        $I->sendGET(self::URL . "?limit=999999"); 
-        $this->checkResponseIsValid($I);
-        $data = $I->grabDataFromResponseByJsonPath('$*');
-        $I->assertEquals($count, count($data));
+        $this->runTestSort($I, 'id', false);
     }
 
-    public function testSortedIdAcs(ApiTester $I) 
+    public function runTestSortIdDesc(ApiTester $I) 
     {
-        $this->testSorted($I, 'id', false);
+        $this->runTestSort($I, 'id', true);
+    }
+    public function runTestSortIdentifierAcs(ApiTester $I) 
+    {
+        $this->runTestSort($I, 'identifier', false);
     }
 
-    public function testSortedIdDesc(ApiTester $I) 
+    public function runTestSortIdentifierDesc(ApiTester $I) 
     {
-        $this->testSorted($I, 'id', true);
-    }
-    public function testSortedIdentifierAcs(ApiTester $I) 
-    {
-        $this->testSorted($I, 'identifier', false);
+        $this->runTestSort($I, 'identifier', true);
     }
 
-    public function testSortedIdentifierDesc(ApiTester $I) 
+    public function runTestSortCollectionAcs(ApiTester $I) 
     {
-        $this->testSorted($I, 'identifier', true);
+        $this->runTestSort($I, 'collection_id', false);
     }
 
-    public function testSortedCollectionAcs(ApiTester $I) 
+    public function runTestSortCollectionDesc(ApiTester $I) 
     {
-        $this->testSorted($I, 'collection_id', false);
+        $this->runTestSort($I, 'collection_id', true);
     }
 
-    public function testSortedCollectionDesc(ApiTester $I) 
+    public function runTestSortLatitudeAcs(ApiTester $I) 
     {
-        $this->testSorted($I, 'collection_id', true);
+        $this->runTestSort($I, 'latitude', false);
     }
 
-    public function testSortedLatitudeAcs(ApiTester $I) 
+    public function runTestSortLatitudeDesc(ApiTester $I) 
     {
-        $this->testSorted($I, 'latitude', false);
+        $this->runTestSort($I, 'latitude', true);
     }
 
-    public function testSortedLatitudeDesc(ApiTester $I) 
+    public function runTestSortLongitudeAcs(ApiTester $I) 
     {
-        $this->testSorted($I, 'latitude', true);
+        $this->runTestSort($I, 'longitude', false);
     }
 
-    public function testSortedLongitudeAcs(ApiTester $I) 
+    public function runTestSortLongitudeDesc(ApiTester $I) 
     {
-        $this->testSorted($I, 'longitude', false);
+        $this->runTestSort($I, 'longitude', true);
     }
 
-    public function testSortedLongitudeDesc(ApiTester $I) 
+    public function runTestSortYearMinAcs(ApiTester $I) 
     {
-        $this->testSorted($I, 'longitude', true);
+        $this->runTestSort($I, 'year_min', false);
     }
 
-    public function testSortedYearMinAcs(ApiTester $I) 
+    public function runTestSortYearMinDesc(ApiTester $I) 
     {
-        $this->testSorted($I, 'year_min', false);
+        $this->runTestSort($I, 'year_min', true);
     }
 
-    public function testSortedYearMinDesc(ApiTester $I) 
+    public function runTestSortYearMaxAcs(ApiTester $I) 
     {
-        $this->testSorted($I, 'year_min', true);
+        $this->runTestSort($I, 'year_max', false);
     }
 
-    public function testSortedYearMaxAcs(ApiTester $I) 
+    public function runTestSortYearMaxDesc(ApiTester $I) 
     {
-        $this->testSorted($I, 'year_max', false);
+        $this->runTestSort($I, 'year_max', true);
     }
 
-    public function testSortedYearMaxDesc(ApiTester $I) 
+    public function runTestSortCreatedAcs(ApiTester $I) 
     {
-        $this->testSorted($I, 'year_max', true);
+        $this->runTestSort($I, 'created', false);
     }
 
-    public function testSortedCreatedAcs(ApiTester $I) 
+    public function runTestSortCreatedDesc(ApiTester $I) 
     {
-        $this->testSorted($I, 'created', false);
+        $this->runTestSort($I, 'created', true);
     }
 
-    public function testSortedCreatedDesc(ApiTester $I) 
+    public function runTestSortModifiedAcs(ApiTester $I) 
     {
-        $this->testSorted($I, 'created', true);
+        $this->runTestSort($I, 'modified', false);
     }
 
-    public function testSortedModifiedAcs(ApiTester $I) 
+    public function runTestSortModifiedDesc(ApiTester $I) 
     {
-        $this->testSorted($I, 'modified', false);
-    }
-
-    public function testSortedModifiedDesc(ApiTester $I) 
-    {
-        $this->testSorted($I, 'modified', true);
-    }
-
-
-
-
-    /* ------------------- private ----------------------- */
-
-    private function checkResponseIsValid(ApiTester $I)
-    {
-        $I->seeResponseCodeIs(\Codeception\Util\HttpCode::OK); //200
-        $I->seeHttpHeader('Content-type', 'application/json;charset=utf-8');
-        $I->seeResponseIsJson();
-    }
-
-    private function testSorted(ApiTester $I, $col, $isDesc)
-    {
-        $order = $isDesc ? 'descending' : 'ascending';
-        $I->wantTo("get records sorted by $col in $order order");
-
-        $desc = $isDesc ? '-' : '';
-        $I->sendGET(self::URL . "?sort=$desc$col"); 
-        $this->checkResponseIsValid($I);
-
-        $data = $I->grabDataFromResponseByJsonPath('$*');
-        $this->checkIsSorted($I, $data, $col, $isDesc);
-    }
-
-    private function checkIsSorted(ApiTester $I, $recordset, $col, $isDesc)
-    {
-        $previous = $isDesc ? 9999 : null;
-
-        foreach ($recordset as $row) {
-            $current= $row[$col];
-            if ($isDesc) {
-                $I->assertGreaterThanOrEqual($current, $previous);
-            } else {
-                $I->assertLessThanOrEqual($current, $previous);
-            }
-            $previous = $current;
-        }
+        $this->runTestSort($I, 'modified', true);
     }
 }
-

@@ -1,35 +1,41 @@
 <?php
 namespace Kronofoto\Test;
 
+require_once 'ControllerCest.php';
+
 use ApiTester;
+use Kronofoto\Controllers\DonorController;
 
-class DonorCest
+class DonorCest extends ControllerCest
 {
-    //TODO: move these out into a helper class or a config location
-    const URL = '/donors';
+    /* ----------- required overrides ----------- */
 
-    private $container; 
-
-    public function _before(ApiTester $I)
+    protected function getURL()
     {
-        $app = require dirname(dirname(__DIR__)) . '/config/bootstrap.php';
-        $this->container = $app->getContainer();
+        return '/donors';
     }
 
-    //all records are published (is_published = 1), unless noted otherwise
-    public function testResponseIsJson(ApiTester $I)
+    protected function getListDataStructure()
     {
-        $I->wantTo('get data in JSON format');
-        $I->sendGET(self::URL); 
-        $this->checkResponseIsValid($I);
+        return [
+            'user_id' => 'integer',
+            'first_name' => 'string',
+            'last_name' => 'string',
+            'collection_count' => 'integer',
+            'item_count' => 'integer',
+            'created' => 'string',
+            'modified' => 'string'
+        ];
     }
+
+    /* --------------- tests for one record ---------------- */
 
     public function testReadOne(ApiTester $I)
     {
         $expectedFields = 7;
         $I->wantTo("get one record by id");
         $id = 221;
-        $I->sendGET(self::URL . "/$id"); 
+        $I->sendGET($this->getURL() . "/$id"); 
         $this->checkResponseIsValid($I);
         $data = $I->grabDataFromResponseByJsonPath('$*');
         $I->assertEquals($expectedFields, count($data));
@@ -44,54 +50,24 @@ class DonorCest
 
     public function testReadAnother(ApiTester $I)
     {
-        $expectedFields = 7;
-        $I->wantTo("get another record by id");
-        $id = 223;
-        $I->sendGET(self::URL . "/$id"); 
-        $this->checkResponseIsValid($I);
-        $data = $I->grabDataFromResponseByJsonPath('$*');
-        $I->assertEquals($expectedFields, count($data));
-        $I->assertEquals($id, $data[0]);
+        $this->runTestReadAnother($I, 223, 7);
     }
 
     public function testReadInvalid(ApiTester $I)
-    {
-        $I->wantTo("see 404 status code and error data");
-        $nonexistantId = 'invalid';
-        $I->sendGET(self::URL . "/$nonexistantId"); 
-        $I->seeResponseCodeIs(\Codeception\Util\HttpCode::NOT_FOUND); //404
-        $data = $I->grabDataFromResponseByJsonPath('$*');
-        $I->assertEquals('404', $data[0]['status']);
-        $I->assertEquals('Requested donor not found', $data[0]['message']);
-        $I->assertEquals('Invalid id', $data[0]['detail']);
+    { 
+        $this->runTestReadInvalid($I, 'donor', 'id');
     }
 
-    public function testDataStructure(ApiTester $I)
-    {
-        $I->wantTo("check the structure of a record");
-        $I->sendGET(self::URL); 
-        $this->checkResponseIsValid($I);
 
-        $I->seeResponseMatchesJsonType([
-            'user_id' => 'integer',
-            'first_name' => 'string',
-            'last_name' => 'string',
-            'collection_count' => 'integer',
-            'item_count' => 'integer',
-            'created' => 'string',
-            'modified' => 'string'
-        ], '$*');
-    }
+    /* --------------- tests for lists of records ---------------- */
 
     public function testFilterByFirstName(ApiTester $I)
     {
         $first_name = 'sh';
         $expected = 7;
         $I->wantTo("get records with first name starting with $first_name");
-        $I->sendGET(self::URL . "?filter[first_name]=$first_name"); 
-        $this->checkResponseIsValid($I);
-        $data = $I->grabDataFromResponseByJsonPath('$*');
-        $I->assertEquals($expected, count($data));
+        $I->sendGET($this->getURL() . "?filter[first_name]=$first_name"); 
+        $this->checkValidAndNumberOfRecords($I, $expected);
     }
 
     public function testFilterByLastName(ApiTester $I)
@@ -99,10 +75,8 @@ class DonorCest
         $last_name = 'sch';
         $expected = 12;
         $I->wantTo("get records with last name starting with $last_name");
-        $I->sendGET(self::URL . "?filter[last_name]=$last_name"); 
-        $this->checkResponseIsValid($I);
-        $data = $I->grabDataFromResponseByJsonPath('$*');
-        $I->assertEquals($expected, count($data));
+        $I->sendGET($this->getURL() . "?filter[last_name]=$last_name"); 
+        $this->checkValidAndNumberOfRecords($I, $expected);
     }
 
     public function testFilterByFirstAndLastName(ApiTester $I)
@@ -112,145 +86,83 @@ class DonorCest
         $expected = 5;
         $I->wantTo("get records with last name starting with $last_name " .  
             "and first name starting with $first_name");
-        $I->sendGET(self::URL . "?filter[last_name]=$last_name&filter[first_name]=$first_name"); 
-        $this->checkResponseIsValid($I);
-        $data = $I->grabDataFromResponseByJsonPath('$*');
-        $I->assertEquals($expected, count($data));
+        $I->sendGET($this->getURL() . 
+            "?filter[last_name]=$last_name&filter[first_name]=$first_name"); 
+        $this->checkValidAndNumberOfRecords($I, $expected);
     }
-  
+
     public function testPaging(ApiTester $I) 
     {
-        $offset = 42;
-        $limit = 10;
-        $sort_by = 'user_id';
-        $expected_first_id = 86;
-        $expected_last_id = 101;
-        $I->wantTo("get $limit records starting after record # $offset");
-        $I->sendGET(self::URL . "?offset=$offset&limit=$limit"); 
-        $this->checkResponseIsValid($I);
-        $data = $I->grabDataFromResponseByJsonPath('$*');
-        $I->assertEquals($limit, count($data));
-        $I->assertEquals($expected_first_id, $data[0]['user_id']);
-        $I->assertEquals($expected_last_id, $data[$limit-1]['user_id']);
+        $this->runTestPaging($I, 42, 10, 'user_id', 86, 101);
     }
 
-    public function testMaxRecordCount(ApiTester $I)
+    public function runTestSortUserIdAcs(ApiTester $I) 
     {
-        $count = (int)$this->container['settings']['paging']['max_records'];
-        $I->wantTo("get not more than $count records");
-        $I->sendGET(self::URL . "?limit=999999"); 
-        $this->checkResponseIsValid($I);
-        $data = $I->grabDataFromResponseByJsonPath('$*');
-        $I->assertEquals($count, count($data));
+        $this->runTestSort($I, 'user_id', false);
     }
 
-    public function testSortedUserIdAcs(ApiTester $I) 
+    public function runTestSortUserIdDecs(ApiTester $I) 
     {
-        $this->testSorted($I, 'user_id', false);
+        $this->runTestSort($I, 'user_id', true);
     }
 
-    public function testSortedUserIdDecs(ApiTester $I) 
+    public function runTestSortFirstNameAcs(ApiTester $I) 
     {
-        $this->testSorted($I, 'user_id', true);
+        $this->runTestSort($I, 'first_name', false);
     }
 
-    public function testSortedFirstNameAcs(ApiTester $I) 
+    public function runTestSortFirstNameDecs(ApiTester $I) 
     {
-        $this->testSorted($I, 'first_name', false);
+        $this->runTestSort($I, 'first_name', true);
     }
 
-    public function testSortedFirstNameDecs(ApiTester $I) 
+    public function runTestSortLastNameAcs(ApiTester $I) 
     {
-        $this->testSorted($I, 'first_name', true);
+        $this->runTestSort($I, 'last_name', false);
     }
 
-    public function testSortedLastNameAcs(ApiTester $I) 
+    public function runTestSortLastNameDecs(ApiTester $I) 
     {
-        $this->testSorted($I, 'last_name', false);
+        $this->runTestSort($I, 'last_name', true);
     }
 
-    public function testSortedLastNameDecs(ApiTester $I) 
+    public function runTestSortCollectionCountAcs(ApiTester $I) 
     {
-        $this->testSorted($I, 'last_name', true);
+        $this->runTestSort($I, 'collection_count', false);
     }
 
-    public function testSortedCollectionCountAcs(ApiTester $I) 
+    public function runTestSortCollectionCountDesc(ApiTester $I) 
     {
-        $this->testSorted($I, 'collection_count', false);
+        $this->runTestSort($I, 'collection_count', true);
     }
 
-    public function testSortedCollectionCountDesc(ApiTester $I) 
+    public function runTestSortItemCountAcs(ApiTester $I) 
     {
-        $this->testSorted($I, 'collection_count', true);
+        $this->runTestSort($I, 'item_count', false);
     }
 
-    public function testSortedItemCountAcs(ApiTester $I) 
+    public function runTestSortItemCountDesc(ApiTester $I) 
     {
-        $this->testSorted($I, 'item_count', false);
+        $this->runTestSort($I, 'item_count', true);
     }
 
-    public function testSortedItemCountDesc(ApiTester $I) 
+    public function runTestSortCreatedAcs(ApiTester $I) 
     {
-        $this->testSorted($I, 'item_count', true);
+        $this->runTestSort($I, 'created', false);
     }
 
-    public function testSortedCreatedAcs(ApiTester $I) 
+    public function runTestSortCreatedDesc(ApiTester $I) 
     {
-        $this->testSorted($I, 'created', false);
+        $this->runTestSort($I, 'created', true);
     }
 
-    public function testSortedCreatedDesc(ApiTester $I) 
+    public function runTestSortModifiedAcs(ApiTester $I) 
     {
-        $this->testSorted($I, 'created', true);
+        $this->runTestSort($I, 'modified', false);
     }
 
-    public function testSortedModifiedAcs(ApiTester $I) 
+    public function runTestSortModifiedDesc(ApiTester $I) 
     {
-        $this->testSorted($I, 'modified', false);
-    }
-
-    public function testSortedModifiedDesc(ApiTester $I) 
-    {
-        $this->testSorted($I, 'modified', true);
-    }
-
-
-
-    /* ------------------- private ----------------------- */
-
-    private function checkResponseIsValid(ApiTester $I)
-    {
-        $I->seeResponseCodeIs(\Codeception\Util\HttpCode::OK); //200
-        $I->seeHttpHeader('Content-type', 'application/json;charset=utf-8');
-        $I->seeResponseIsJson();
-    }
-
-    private function testSorted(ApiTester $I, $col, $isDesc)
-    {
-        $order = $isDesc ? 'descending' : 'ascending';
-        $I->wantTo("get records sorted by $col in $order order");
-
-        $desc = $isDesc ? '-' : '';
-        $I->sendGET(self::URL . "?sort=$desc$col"); 
-        $this->checkResponseIsValid($I);
-
-        $data = $I->grabDataFromResponseByJsonPath('$*');
-        $this->checkIsSorted($I, $data, $col, $isDesc);
-    }
-
-    private function checkIsSorted(ApiTester $I, $recordset, $col, $isDesc)
-    {
-        $previous = $isDesc ? 9999 : null;
-
-        foreach ($recordset as $row) {
-            $current= $row[$col];
-            if ($isDesc) {
-                $I->assertGreaterThanOrEqual($current, $previous);
-            } else {
-                $I->assertLessThanOrEqual($current, $previous);
-            }
-            $previous = $current;
-        }
+        $this->runTestSort($I, 'modified', true);
     }
 }
-
