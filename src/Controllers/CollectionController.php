@@ -1,30 +1,22 @@
 <?php
-namespace Kronofoto;
+namespace Kronofoto\Controllers;
 
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
 use Interop\Container\ContainerInterface;
 
+use Kronofoto\Models\CollectionModel;
+use Kronofoto\QueryStringHelper;
+
 class CollectionController 
 { 
-    const FIELDS = [
-        'id', 
-        'name', 
-        'year_min', 
-        'year_max', 
-        'item_count', 
-        'is_published', 
-        'created', 
-        'modified', 
-        'donor_id', 
-        'featured_item_id'
-    ];
-
-    protected $container;
+    private $container;
+    private $model;
 
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
+        $this->model = $this->container->CollectionModel;
     }
 
     public function read(Request $request, Response $response, array $args) 
@@ -102,7 +94,7 @@ class CollectionController
             ->innerJoin('c', 'accounts_user', 'u', 'c.donor_id = u.id')
             ->where('is_published = 1'); //because for now this is for public site only
 
-        $qs = new QueryStringHelper($qParams, self::FIELDS, $this->container);
+        $qs = new QueryStringHelper($qParams, $this->model, $this->container);
 
         if ($qs->hasSortParam()) {
             $qBuilder

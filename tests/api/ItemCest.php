@@ -99,18 +99,6 @@ class ItemCest
         $data = $I->grabDataFromResponseByJsonPath('$*');
         $I->assertEquals($expected, count($data));
     }
-
-    public function testFilterByCollectionId(ApiTester $I)
-    {
-        $collection_id = 36;
-        $expected = 5;
-        $I->wantTo("get records with collection_id: $collection_id" );
-        $I->sendGET(self::URL . "?filter[collection_id]=$collection_id"); 
-        $this->checkResponseIsValid($I);
-        $data = $I->grabDataFromResponseByJsonPath('$*');
-        $I->assertEquals($expected, count($data));
-    }
-
     public function testFilterGetItemsBeforeYear(ApiTester $I)
     {
         $year = 1870;
@@ -121,14 +109,14 @@ class ItemCest
         $data = $I->grabDataFromResponseByJsonPath('$*');
         $I->assertEquals($expected, count($data));
     }
-/*
+
     public function testFilterGetItemsAfterYear(ApiTester $I)
     {
         $year = 1999;
         $expected = 28;
         $I->wantTo("get items dated $year or later");
         //add limit param to retrieve more than default
-        $I->sendGET(self::URL . "?limit=100&filter[year_max]=$year"); 
+        $I->sendGET(self::URL . "?limit=100&filter[after]=$year"); 
         $this->checkResponseIsValid($I);
         $data = $I->grabDataFromResponseByJsonPath('$*');
         $I->assertEquals($expected, count($data));
@@ -138,9 +126,9 @@ class ItemCest
     {
         $year1 = 1901;
         $year2 = 1903;
-        $expected = 11;
+        $expected = 10;
         $I->wantTo("get items dated between $year1 and $year2");
-        $I->sendGET(self::URL . "?filter[year_min]=$year2&filter[year_max]=$year1"); 
+        $I->sendGET(self::URL . "?filter[after]=$year1&filter[before]=$year2"); 
         $this->checkResponseIsValid($I);
         $data = $I->grabDataFromResponseByJsonPath('$*');
         $I->assertEquals($expected, count($data));
@@ -151,12 +139,13 @@ class ItemCest
         $year = 1901;
         $expected = 3;
         $I->wantTo("get items dated $year");
-        $I->sendGET(self::URL . "?filter[year_min]=$year&filter[year_max]=$year"); 
+        $I->sendGET(self::URL . "?filter[year]=$year"); 
         $this->checkResponseIsValid($I);
         $data = $I->grabDataFromResponseByJsonPath('$*');
         $I->assertEquals($expected, count($data));
     }
- */ 
+  
+    
     public function testPaging(ApiTester $I) 
     {
         $offset = 42;
@@ -183,6 +172,15 @@ class ItemCest
         $I->assertEquals($count, count($data));
     }
 
+    public function testSortedIdAcs(ApiTester $I) 
+    {
+        $this->testSorted($I, 'id', false);
+    }
+
+    public function testSortedIdDesc(ApiTester $I) 
+    {
+        $this->testSorted($I, 'id', true);
+    }
     public function testSortedIdentifierAcs(ApiTester $I) 
     {
         $this->testSorted($I, 'identifier', false);
@@ -241,16 +239,6 @@ class ItemCest
     public function testSortedYearMaxDesc(ApiTester $I) 
     {
         $this->testSorted($I, 'year_max', true);
-    }
-
-    public function testSortedIsPublishedAcs(ApiTester $I) 
-    {
-        $this->testSorted($I, 'is_published', false);
-    }
-
-    public function testSortedIsPublishedDesc(ApiTester $I) 
-    {
-        $this->testSorted($I, 'is_published', true);
     }
 
     public function testSortedCreatedAcs(ApiTester $I) 

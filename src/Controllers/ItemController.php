@@ -1,30 +1,22 @@
 <?php
-namespace Kronofoto\Controller;
+namespace Kronofoto\Controllers;
 
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
 use Interop\Container\ContainerInterface;
 
+use Kronofoto\Models\ItemModel;
+use Kronofoto\QueryStringHelper;
+
 class ItemController 
 {
-    const FIS = [
-        'id',
-        'identifier',
-        'collection_id',
-        'latitude',
-        'longitude',
-        'year_min',
-        'year_max',
-        'is_published',
-        'created', 
-        'modified' 
-    ];
-
-    protected $container;
+    private $container;
+    private $model;
 
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
+        $this->model = $this->container->ItemModel;
     }
 
     public function read(Request $request, Response $response, array $args) 
@@ -95,44 +87,47 @@ class ItemController
             ->from('archive_item', 'i')
             ->where('i.is_published = 1'); 
 
-        $qs = new QueryStringHelper($qParams, self::FIELDS, $this->container);
+        $qs = new QueryStringHelper($qParams, $this->model, $this->container);
         //
         //TODO this will need refactoring
         if ($qs->hasFilterParam()) {
             $filterParams = $qs->getFilterParams();
             foreach ($filterParams as $fp) {
-                $field = $fp['field'];
+                $key= $fp['key'];
                 $value = $fp['value'];
 
-                if ($field == 'collection_id') {
-                    $qBuilder
-                        ->andWhere(
-                            $qBuilder->expr()->eq($field, ":$field"))
-                            ->setParameter($field, "$value");
-                }
-
-                if ($field == 'year_min') {
-                    $qBuilder
-                        ->andWhere(
-                            $qBuilder->expr()->lte($field, ":$field"))
-                            ->setParameter($field, "$value");
-                }
-
-                if ($field == 'year_max') {
-                    $qBuilder
-                        ->andWhere(
-                            $qBuilder->expr()->gte($field, ":$field"))
-                            ->setParameter($field, "$value");
-                }
-
-                if ($field == 'identifier') {
+                if ($key == 'identifier') {
                     $value .= '%';
                     $qBuilder
                         ->andWhere(
-                            $qBuilder->expr()->like($field, ":$field"))
-                            ->setParameter($field, "$value");
+                            $qBuilder->expr()->like($key, ":$key"))
+                            ->setParameter($key, "$value");
                 }
-            }
+ 
+                if ($key == 'before') {
+                    $qBuilder
+                        ->andWhere(
+                            $qBuilder->expr()->lte('year_min', ':year_min'))
+                            ->setParameter('year_min', "$value");
+                }
+                
+                if ($key == 'after') {
+                    $qBuilder
+                        ->andWhere(
+                            $qBuilder->expr()->gte('year_max', ':year_max'))
+                            ->setParameter('year_max', "$value");
+                }
+ 
+                if ($key == 'year') {
+                    $qBuilder
+                        ->andWhere(
+                            $qBuilder->expr()->lte('year_min', ":$key"))
+                            ->setParameter($key, "$value")
+                        ->andWhere(
+                            $qBuilder->expr()->gte('year_max', ":$key"))
+                            ->setParameter($key, "$value");
+                }
+           }
         }
 
 
@@ -147,7 +142,6 @@ class ItemController
 
         $stmt = $qBuilder->execute();
 
-        //print($qBuilder->getSql());
         $result = $stmt->fetchAll();
 
         return $response->withJson($result);

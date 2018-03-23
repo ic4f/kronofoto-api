@@ -2,6 +2,7 @@
 namespace Kronofoto\Test;
 
 use ApiTester;
+use Kronofoto\Controllers\CollectionController;
 
 class CollectionsCest
 {

@@ -1,27 +1,22 @@
 <?php
-namespace Kronofoto;
+namespace Kronofoto\Controllers;
 
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
 use Interop\Container\ContainerInterface;
 
+use Kronofoto\Models\DonorModel;
+use Kronofoto\QueryStringHelper;
+
 class DonorController
 {
-    const FIELDS = [
-        'user_id', 
-        'first_name', 
-        'last_name', 
-        'collection_count', 
-        'item_count', 
-        'created', 
-        'modified' 
-    ];
-
-    protected $container;
+    private $container;
+    private $model;
 
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
+        $this->model = $this->container->DonorModel;
     }
 
     public function read(Request $request, Response $response, array $args) 
@@ -33,7 +28,7 @@ class DonorController
         $qBuilder = $conn->createQueryBuilder();
 
         $qBuilder
-             ->select(
+            ->select(
                 'd.user_id',
                 'u.first_name',
                 'u.last_name',
@@ -88,19 +83,20 @@ class DonorController
             ->innerJoin('d', 'accounts_user', 'u', 'd.user_id = u.id')
             ->where('1 = 1'); 
 
-        $qs = new QueryStringHelper($qParams, self::FIELDS, $this->container);
+        $qs = new QueryStringHelper($qParams, $this->model, $this->container);
+
 
         //TODO this will need refactoring
         if ($qs->hasFilterParam()) {
             $filterParams = $qs->getFilterParams();
             foreach ($filterParams as $fp) {
-                $field = $fp['field'];
+                $field = $fp['key'];
                 $value = $fp['value'];
                 $value .= '%';
                 $qBuilder
                     ->andWhere(
                         $qBuilder->expr()->like($field, ":$field"))
-                    ->setParameter($field, "$value");
+                        ->setParameter($field, "$value");
             }
         }
 
