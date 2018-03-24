@@ -104,32 +104,21 @@ class ItemController
                             ->setParameter($key, "$value");
                 }
  
-                if ($key == 'before') {
+                if ($key == 'year' || $key == 'before') {
                     $qBuilder
                         ->andWhere(
                             $qBuilder->expr()->lte('year_min', ':year_min'))
                             ->setParameter('year_min', "$value");
                 }
                 
-                if ($key == 'after') {
+                if ($key == 'year' || $key == 'after') {
                     $qBuilder
                         ->andWhere(
                             $qBuilder->expr()->gte('year_max', ':year_max'))
                             ->setParameter('year_max', "$value");
                 }
- 
-                if ($key == 'year') {
-                    $qBuilder
-                        ->andWhere(
-                            $qBuilder->expr()->lte('year_min', ":$key"))
-                            ->setParameter($key, "$value")
-                        ->andWhere(
-                            $qBuilder->expr()->gte('year_max', ":$key"))
-                            ->setParameter($key, "$value");
-                }
            }
         }
-
 
         if ($qs->hasSortParam()) {
             $qBuilder
