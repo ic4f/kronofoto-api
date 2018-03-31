@@ -5,7 +5,7 @@
 class HttpMethodCest
 {
     //TODO: move these out into a helper class or a config location
-    const VALID_URL = '/collections'; //known valid url
+    const VALID_URL = '/api/collections'; //known valid url
 
     public function allowedMethodGet(ApiTester $I)
     {

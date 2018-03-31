@@ -1,19 +1,21 @@
 <?php
+$base = '/api';
+
 //get one record by id
-$app->get('/items/{id}',             'Kronofoto\Controllers\ItemController:read');
-$app->get('/donors/{id}',            'Kronofoto\Controllers\DonorController:read');
-$app->get('/collections/{id}',       'Kronofoto\Controllers\CollectionController:read');
+$app->get($base . '/items/{id}',             'Kronofoto\Controllers\ItemController:read');
+$app->get($base . '/donors/{id}',            'Kronofoto\Controllers\DonorController:read');
+$app->get($base . '/collections/{id}',       'Kronofoto\Controllers\CollectionController:read');
 //
 ////all 'get records' queries accecpt optional querystrings
 //
 //items
-$app->get('/items',                   'Kronofoto\Controllers\ItemController:getItems');
-//$app->get('/donors/{id}/items',       'Kronofoto\ItemController:getDonorItems');
-//$app->get('/collections/{id}/items',  'Kronofoto\ItemController:getCollectionItems');
+$app->get($base . '/items',                   'Kronofoto\Controllers\ItemController:getItems');
+//$app->get($base . '/donors/{id}/items',       'Kronofoto\ItemController:getDonorItems');
+//$app->get($base . '/collections/{id}/items',  'Kronofoto\ItemController:getCollectionItems');
 //
 //donors
-$app->get('/donors',                  'Kronofoto\Controllers\DonorController:getDonors');
+$app->get($base . '/donors',                  'Kronofoto\Controllers\DonorController:getDonors');
 
 //collections
-$app->get('/collections',             'Kronofoto\Controllers\CollectionController:getCollections');
-//$app->get('/donors/{id}/collections', 'Kronofoto\CollectionController:getDonorCollections');
+$app->get($base . '/collections',             'Kronofoto\Controllers\CollectionController:getCollections');
+//$app->get($base . '/donors/{id}/collections', 'Kronofoto\CollectionController:getDonorCollections');

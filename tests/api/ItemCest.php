@@ -10,9 +10,9 @@ class ItemCest extends ControllerCest
 {
     /* ----------- required overrides ----------- */
 
-    protected function getURL()
+    protected function getURLHelper()
     {
-        return '/items';
+        return 'items';
     }
 
     protected function getListDataStructure()

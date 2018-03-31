@@ -10,9 +10,9 @@ class CollectionCest extends ControllerCest
 {
     /* ----------- required overrides ----------- */
 
-    protected function getURL()
+    protected function getURLHelper()
     {
-        return '/collections';
+        return 'collections';
     }
 
     protected function getListDataStructure()

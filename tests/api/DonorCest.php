@@ -10,9 +10,9 @@ class DonorCest extends ControllerCest
 {
     /* ----------- required overrides ----------- */
 
-    protected function getURL()
+    protected function getURLHelper()
     {
-        return '/donors';
+        return 'donors';
     }
 
     protected function getListDataStructure()

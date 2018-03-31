@@ -6,9 +6,10 @@ use ApiTester;
 abstract class ControllerCest
 {
     protected $container; 
+    protected $baseUrl = '/api/';
 
     /* default base URL */
-    protected abstract function getURL();
+    protected abstract function getURLHelper();
 
     /* structure of a record which is part of a list 
      * return format: ['field1' => 'type', 'field2' => 'type', ... ]
@@ -121,6 +122,11 @@ abstract class ControllerCest
         $this->checkResponseIsValid($I);
         $data = $I->grabDataFromResponseByJsonPath('$*');
         $I->assertEquals($expected, count($data));
+    }
+
+    protected function getURL()
+    {
+        return  $this->baseUrl . $this->getUrlHelper();
     }
 
     /* --------------- private ---------------- */
