@@ -15,7 +15,8 @@ class CollectionModel extends Model
             'created',
             'modified',
             'donor_id',
-            'featured_item_id'
+            'donor_first_name',
+            'donor_last_name'
         ];
     }
 

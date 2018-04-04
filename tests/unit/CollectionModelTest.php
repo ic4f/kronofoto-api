@@ -16,7 +16,8 @@ class CollectionModelTest extends \Codeception\Test\Unit
         $this->assertTrue($model->validateSort('created')); 
         $this->assertTrue($model->validateSort('modified')); 
         $this->assertTrue($model->validateSort('donor_id')); 
-        $this->assertTrue($model->validateSort('featured_item_id')); 
+        $this->assertTrue($model->validateSort('donor_first_name')); 
+        $this->assertTrue($model->validateSort('donor_last_name')); 
     }
 
     public function testValidateBadSortCriteria()

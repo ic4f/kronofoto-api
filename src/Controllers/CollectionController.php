@@ -39,12 +39,14 @@ class CollectionController
                 'c.created',
                 'c.modified',
                 'c.featured_item_id',
+                'i.identifier as featured_item_identifier',
                 'c.donor_id',
                 'u.first_name as donor_first_name',
                 'u.last_name as donor_last_name'
             )
             ->from('archive_collection', 'c')
             ->innerJoin('c', 'accounts_user', 'u', 'c.donor_id = u.id')
+            ->innerJoin('c', 'archive_item', 'i', 'c.featured_item_id = i.id')
             ->where('c.id = :id')
             ->setParameter('id', $id);
 
@@ -82,17 +84,17 @@ class CollectionController
                 'c.year_min', 
                 'c.year_max', 
                 'c.item_count', 
-                'c.is_published',
                 'c.created',
                 'c.modified',
-                'c.featured_item_id',
+                'i.identifier as featured_item_identifier',
                 'c.donor_id',
                 'u.first_name as donor_first_name',
                 'u.last_name as donor_last_name'
             )
             ->from('archive_collection', 'c')
             ->innerJoin('c', 'accounts_user', 'u', 'c.donor_id = u.id')
-            ->where('is_published = 1'); //because for now this is for public site only
+            ->innerJoin('c', 'archive_item', 'i', 'c.featured_item_id = i.id')
+            ->where('c.is_published = 1'); //because for now this is for public site only
 
         $qs = new QueryStringHelper($qParams, $this->model, $this->container);
 

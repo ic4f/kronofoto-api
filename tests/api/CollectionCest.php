@@ -23,10 +23,9 @@ class CollectionCest extends ControllerCest
             'year_min' => 'integer|null',
             'year_max' => 'integer|null',
             'item_count' => 'integer',
-            'is_published' => 'integer',
             'created' => 'string',
             'modified' => 'string',
-            'featured_item_id' => 'integer|null',
+            'featured_item_identifier' => 'string|null',
             'donor_id' => 'integer',
             'donor_first_name' => 'string',
             'donor_last_name' => 'string'
@@ -37,7 +36,7 @@ class CollectionCest extends ControllerCest
 
     public function testReadOne(ApiTester $I)
     {
-        $expectedFields = 13;
+        $expectedFields = 14;
         $I->wantTo("get one record by id");
         $id = 10;
         $I->sendGET($this->getURL() . "/$id"); 
@@ -45,23 +44,24 @@ class CollectionCest extends ControllerCest
         $data = $I->grabDataFromResponseByJsonPath('$*');
         $I->assertEquals($expectedFields, count($data));
         $I->assertEquals($id, $data[0]);
-        $I->assertEquals('', $data[1]);
+        $I->assertEquals('Bull and Schnell Family', $data[1]);
         $I->assertEquals(1919, $data[2]);
         $I->assertEquals(1965, $data[3]);
         $I->assertEquals(39, $data[4]);
         $I->assertEquals(1, $data[5]);
-        $I->assertEquals('', $data[6]);
+        $I->assertEquals('Ardith Bull and Theresa Ecklund', $data[6]);
         $I->assertEquals('2015-05-19 13:31:01', $data[7]);
         $I->assertEquals('2015-05-19 13:31:01', $data[8]);
-        $I->assertEquals('', $data[9]);
-        $I->assertEquals(17, $data[10]);
-        $I->assertEquals('Ardith', $data[11]);
-        $I->assertEquals('Bull', $data[12]);
+        $I->assertEquals(135, $data[9]);
+        $I->assertEquals('FI000005', $data[10]);
+        $I->assertEquals(17, $data[11]);
+        $I->assertEquals('Ardith', $data[12]);
+        $I->assertEquals('Bull', $data[13]);
     }
 
     public function testReadAnother(ApiTester $I)
     {
-        $this->runTestReadAnother($I, 20, 13);
+        $this->runTestReadAnother($I, 20, 14);
     }
 
     public function testReadInvalid(ApiTester $I)
@@ -73,7 +73,7 @@ class CollectionCest extends ControllerCest
 
     public function testPaging(ApiTester $I) 
     {
-        $this->runTestPaging($I, 42, 10, 'id', 51, 60);
+        $this->runTestPaging($I, 42, 10, 'id', 45, 54);
     }
 
     public function runTestSortYearMinAcs(ApiTester $I) 
@@ -106,16 +106,6 @@ class CollectionCest extends ControllerCest
         $this->runTestSort($I, 'item_count', true);
     }
 
-    public function runTestSortIsPublishedAcs(ApiTester $I) 
-    {
-        $this->runTestSort($I, 'is_published', false);
-    }
-
-    public function runTestSortIsPublishedDesc(ApiTester $I) 
-    {
-        $this->runTestSort($I, 'is_published', true);
-    }
-
     public function runTestSortCreatedAcs(ApiTester $I) 
     {
         $this->runTestSort($I, 'created', false);
@@ -144,15 +134,5 @@ class CollectionCest extends ControllerCest
     public function runTestSortDonorIdDesc(ApiTester $I) 
     {
         $this->runTestSort($I, 'donor_id', true);
-    }
-
-    public function runTestSortFeaturedItemIdAcs(ApiTester $I) 
-    {
-        $this->runTestSort($I, 'featured_item_id', false);
-    }
-
-    public function runTestSortFeaturedItemIdDesc(ApiTester $I) 
-    {
-        $this->runTestSort($I, 'featured_item_id', true);
     }
 }
