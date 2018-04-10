@@ -4,7 +4,6 @@ namespace Kronofoto\Test;
 require_once 'ControllerCest.php';
 
 use ApiTester;
-use Kronofoto\Controllers\CollectionController;
 
 class CollectionCest extends ControllerCest
 {
@@ -74,6 +73,11 @@ class CollectionCest extends ControllerCest
     public function testPaging(ApiTester $I) 
     {
         $this->runTestPaging($I, 42, 10, 'id', 45, 54);
+    }
+
+    public function testPagingHeaders(ApiTester $I) 
+    {
+        $this->runTestPagingHeaders($I, 270, 10, 277);
     }
 
     public function runTestSortYearMinAcs(ApiTester $I) 

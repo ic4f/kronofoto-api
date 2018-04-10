@@ -7,6 +7,8 @@ use Interop\Container\ContainerInterface;
 
 use Kronofoto\Models\CollectionModel;
 use Kronofoto\QueryStringHelper;
+use Kronofoto\PagingHelper;
+use Kronofoto\HttpHelper;
 
 class CollectionController 
 { 
@@ -103,14 +105,56 @@ class CollectionController
                 ->orderBy($qs->getSortField(), $qs->getSortOrder());
         }
 
+        $limit = $qs->getLimit();
+        $offset = $qs->getOffset();
+
         $qBuilder
-            ->setFirstResult($qs->getOffset())
-            ->setMaxResults($qs->getLimit());
+            ->setFirstResult($offset)
+            ->setMaxResults($limit);
 
         $stmt = $qBuilder->execute();
         $result = $stmt->fetchAll();
 
+
+        $response = $this->setPagingHeaders($response, $limit, $offset);
+
+
         return $response->withJson($result);
+    }
+
+    private function setPagingHeaders($response, $limit, $offset) 
+    {
+        $totalRecords = '' + $this->getCollectionsCount();
+
+        $paging = new PagingHelper($totalRecords, $limit, $offset);
+
+        $response = $response->withHeader(HttpHelper::PAGING_RECORDS, $totalRecords);
+        $response = $response->withHeader(HttpHelper::PAGING_PAGES, $paging->getPageCount());
+        $response = $response->withHeader(HttpHelper::PAGING_PAGESIZE, $paging->getCurrentPageSize());
+        $response = $response->withHeader(HttpHelper::PAGING_PAGE, $paging->getCurrentPage());
+        $response = $response->withHeader(HttpHelper::PAGING_FIRST, $paging->getFirstRecord());
+        $response = $response->withHeader(HttpHelper::PAGING_LAST, $paging->getLastRecord());
+
+        return $response;
+
+    }
+
+    private function getCollectionsCount()
+    {
+        $conn = $this->container->db;
+
+        $qBuilder = $conn->createQueryBuilder();
+
+        //$qParams = $request->getQueryParams();
+
+        $qBuilder->select('count(*)')
+            ->from('archive_collection', 'c')
+            //no joins for counting; but this could cause a bug (null related record)
+            ->where('c.is_published = 1'); //because for now this is for public site only
+        //also, must add the same filtering!
+        
+        $stmt = $qBuilder->execute();
+        return $stmt->fetchColumn(0);
     }
 
     public function getDonorCollections(Request $request, Response $response, array $args) 

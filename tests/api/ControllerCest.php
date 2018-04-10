@@ -1,7 +1,8 @@
-<?php
-namespace Kronofoto\Test;
+<?php namespace Kronofoto\Test;
 
 use ApiTester;
+
+use Kronofoto\HttpHelper;
 
 abstract class ControllerCest
 {
@@ -80,6 +81,34 @@ abstract class ControllerCest
         $I->assertEquals("Invalid $field", $data[0]['detail']);
     }
 
+    protected function runTestPagingHeaders(
+        ApiTester $I, 
+        $offset, 
+        $limit, 
+        $expected_total_records)
+    {
+
+        //TODO
+        $expected_pages = 28;
+        $expected_pagesize = 7;
+        $expected_page = 28;
+        $expected_first = 271;
+        $expected_last = 277;
+
+        $I->wantTo("get paging info via http headers");
+        $I->sendGET($this->getURL() . "?offset=$offset&limit=$limit"); 
+        $this->checkResponseIsValid($I);
+        $data = $I->grabDataFromResponseByJsonPath('$*');
+
+        $I->seeHttpHeader(HttpHelper::PAGING_RECORDS, $expected_total_records);
+        $I->seeHttpHeader(HttpHelper::PAGING_PAGES, $expected_pages);
+        $I->seeHttpHeader(HttpHelper::PAGING_PAGESIZE, $expected_pagesize);
+        $I->seeHttpHeader(HttpHelper::PAGING_PAGE, $expected_page);
+        $I->seeHttpHeader(HttpHelper::PAGING_FIRST, $expected_first);
+        $I->seeHttpHeader(HttpHelper::PAGING_LAST, $expected_last);
+
+    }
+
     protected function runTestPaging(
         ApiTester $I, 
         $offset, 
@@ -95,7 +124,7 @@ abstract class ControllerCest
         $I->assertEquals($limit, count($data));
         $I->assertEquals($expected_first_id, $data[0][$id_column]);
         $I->assertEquals($expected_last_id, $data[$limit-1][$id_column]);
-    } 
+    }
 
     protected function runTestSort(ApiTester $I, $col, $isDesc)
     {
