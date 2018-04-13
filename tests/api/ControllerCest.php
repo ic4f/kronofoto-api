@@ -101,7 +101,6 @@ abstract class ControllerCest
         $I->seeHttpHeader(HttpHelper::PAGINATION_FIRST_RECORD, $expected_firstRecord);
         $I->seeHttpHeader(HttpHelper::PAGINATION_LAST_RECORD, $expected_lastRecord);
         $I->seeHttpHeader(HttpHelper::PAGINATION_TOTAL_PAGES, $expected_totalPages);
-        $I->seeHttpHeader(HttpHelper::PAGINATION_PAGE_SIZE, $expected_pageSize);
         $I->seeHttpHeader(HttpHelper::PAGINATION_PAGE_NUMBER, $expected_pageNumber);
 
     }

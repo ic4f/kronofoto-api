@@ -130,7 +130,6 @@ class CollectionController
         $response = $response->withHeader(HttpHelper::PAGINATION_FIRST_RECORD, $pager->firstRecord());
         $response = $response->withHeader(HttpHelper::PAGINATION_LAST_RECORD, $pager->lastRecord());
         $response = $response->withHeader(HttpHelper::PAGINATION_TOTAL_PAGES, $pager->totalPages());
-        $response = $response->withHeader(HttpHelper::PAGINATION_PAGE_SIZE, $pager->currentPageSize());
         $response = $response->withHeader(HttpHelper::PAGINATION_PAGE_NUMBER, $pager->currentPageNumber());
 
         return $response;

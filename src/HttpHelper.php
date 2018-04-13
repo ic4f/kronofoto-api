@@ -9,6 +9,5 @@ class HttpHelper
     const PAGINATION_FIRST_RECORD  = 'Pagination-First-Record';
     const PAGINATION_LAST_RECORD   = 'Pagination-Last-Record';
     const PAGINATION_TOTAL_PAGES   = 'Pagination-Total-Pages';
-    const PAGINATION_PAGE_SIZE     = 'Pagination-Page-Size';
     const PAGINATION_PAGE_NUMBER   = 'Pagination-Page-Number';
 }
