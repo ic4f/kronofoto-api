@@ -79,19 +79,27 @@ class QueryStringHelper
     public function getOffset()
     {
         if (array_key_exists(self::OFFSET_KEY, $this->params)) {
-            return (int)$this->params[self::OFFSET_KEY];
+            //validates against limit < 0
+            return max(0, (int)$this->params[self::OFFSET_KEY]);
         }
         return 0;
     }
 
     public function getLimit()
     {
+        $defaultLimit = (int)$this->container['settings']['paging']['default_page_size'];
         if (array_key_exists(self::LIMIT_KEY, $this->params)) {
-            $limit = (int)$this->params[self::LIMIT_KEY];
+            $limit = (int)$this->params[self::LIMIT_KEY]; 
+
+            //validates against limit <= 0
+            if ($limit <= 0) {
+                $limit = $defaultLimit;
+            }
+            //prevent requesting more than maximum allowed page size
             $maxRecords = (int)$this->container['settings']['paging']['max_records'];
             return min($limit, $maxRecords);
         }
-        return (int)$this->container['settings']['paging']['default_page_size'];
+        return $defaultLimit;
     }
 
     private function validateValue($key, $value)

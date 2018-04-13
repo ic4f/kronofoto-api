@@ -69,7 +69,6 @@ class CollectionCest extends ControllerCest
     }
 
     /* --------------- tests for lists of records ---------------- */
-
     public function testPaging(ApiTester $I) 
     {
         $this->runTestPaging($I, 42, 10, 'id', 45, 54);
@@ -77,7 +76,24 @@ class CollectionCest extends ControllerCest
 
     public function testPagingHeaders(ApiTester $I) 
     {
-        $this->runTestPagingHeaders($I, 270, 10, 277);
+        $offset = 270;
+        $limit = 10;
+        $expected_totalRecords = 277;
+        $expected_firstRecord  = 271;
+        $expected_lastRecord   = 277;
+        $expected_totalPages   = 28;
+        $expected_pageSize     = 7;
+        $expected_pageNumber   = 28;
+        $this->runTestPagingHeaders(
+            $I, 
+            $offset, 
+            $limit,
+            $expected_totalRecords,
+            $expected_firstRecord,
+            $expected_lastRecord,
+            $expected_totalPages, 
+            $expected_pageSize,
+            $expected_pageNumber);
     }
 
     public function runTestSortYearMinAcs(ApiTester $I) 

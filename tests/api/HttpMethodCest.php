@@ -5,7 +5,7 @@
 class HttpMethodCest
 {
     //TODO: move these out into a helper class or a config location
-    const VALID_URL = '/api/collections'; //known valid url
+    const VALID_URL = '/api/donors'; //known valid url
 
     public function allowedMethodGet(ApiTester $I)
     {
@@ -40,4 +40,5 @@ class HttpMethodCest
         $I->sendDELETE(self::VALID_URL); 
         $I->seeResponseCodeIs(\Codeception\Util\HttpCode::METHOD_NOT_ALLOWED); // 405
     }
+ 
 }

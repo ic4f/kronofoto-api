@@ -4,7 +4,6 @@ namespace Kronofoto\Test;
 require_once 'ControllerCest.php';
 
 use ApiTester;
-use Kronofoto\Controllers\DonorController;
 
 class DonorCest extends ControllerCest
 {

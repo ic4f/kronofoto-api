@@ -84,28 +84,25 @@ abstract class ControllerCest
     protected function runTestPagingHeaders(
         ApiTester $I, 
         $offset, 
-        $limit, 
-        $expected_total_records)
+        $limit,
+        $expected_totalRecords,
+        $expected_firstRecord,
+        $expected_lastRecord,
+        $expected_totalPages, 
+        $expected_pageSize,
+        $expected_pageNumber)
     {
-
-        //TODO
-        $expected_pages = 28;
-        $expected_pagesize = 7;
-        $expected_page = 28;
-        $expected_first = 271;
-        $expected_last = 277;
-
-        $I->wantTo("get paging info via http headers");
+        $I->wantTo("get pagination data via http headers");
         $I->sendGET($this->getURL() . "?offset=$offset&limit=$limit"); 
         $this->checkResponseIsValid($I);
         $data = $I->grabDataFromResponseByJsonPath('$*');
 
-        $I->seeHttpHeader(HttpHelper::PAGING_RECORDS, $expected_total_records);
-        $I->seeHttpHeader(HttpHelper::PAGING_PAGES, $expected_pages);
-        $I->seeHttpHeader(HttpHelper::PAGING_PAGESIZE, $expected_pagesize);
-        $I->seeHttpHeader(HttpHelper::PAGING_PAGE, $expected_page);
-        $I->seeHttpHeader(HttpHelper::PAGING_FIRST, $expected_first);
-        $I->seeHttpHeader(HttpHelper::PAGING_LAST, $expected_last);
+        $I->seeHttpHeader(HttpHelper::PAGINATION_TOTAL_RECORDS, $expected_totalRecords);
+        $I->seeHttpHeader(HttpHelper::PAGINATION_FIRST_RECORD, $expected_firstRecord);
+        $I->seeHttpHeader(HttpHelper::PAGINATION_LAST_RECORD, $expected_lastRecord);
+        $I->seeHttpHeader(HttpHelper::PAGINATION_TOTAL_PAGES, $expected_totalPages);
+        $I->seeHttpHeader(HttpHelper::PAGINATION_PAGE_SIZE, $expected_pageSize);
+        $I->seeHttpHeader(HttpHelper::PAGINATION_PAGE_NUMBER, $expected_pageNumber);
 
     }
 

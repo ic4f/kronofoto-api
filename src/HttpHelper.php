@@ -4,10 +4,11 @@ namespace Kronofoto;
 
 class HttpHelper
 {
-    const PAGING_RECORDS  = 'Paging-total-records';
-    const PAGING_PAGES    = 'Paging-total-pages';
-    const PAGING_PAGESIZE = 'Paging-page-size';
-    const PAGING_PAGE     = 'Paging-page';
-    const PAGING_FIRST    = 'Paging-first-record';
-    const PAGING_LAST     = 'Paging-last-record';
+    //http header fields
+    const PAGINATION_TOTAL_RECORDS = 'Pagination-Total-Records';
+    const PAGINATION_FIRST_RECORD  = 'Pagination-First-Record';
+    const PAGINATION_LAST_RECORD   = 'Pagination-Last-Record';
+    const PAGINATION_TOTAL_PAGES   = 'Pagination-Total-Pages';
+    const PAGINATION_PAGE_SIZE     = 'Pagination-Page-Size';
+    const PAGINATION_PAGE_NUMBER   = 'Pagination-Page-Number';
 }

@@ -7,7 +7,7 @@ use Interop\Container\ContainerInterface;
 
 use Kronofoto\Models\CollectionModel;
 use Kronofoto\QueryStringHelper;
-use Kronofoto\PagingHelper;
+use Kronofoto\Pagination;
 use Kronofoto\HttpHelper;
 
 class CollectionController 
@@ -115,25 +115,23 @@ class CollectionController
         $stmt = $qBuilder->execute();
         $result = $stmt->fetchAll();
 
-
         $response = $this->setPagingHeaders($response, $limit, $offset);
-
 
         return $response->withJson($result);
     }
 
     private function setPagingHeaders($response, $limit, $offset) 
     {
-        $totalRecords = '' + $this->getCollectionsCount();
+        $totalRecords = $this->getCollectionsCount();
 
-        $paging = new PagingHelper($totalRecords, $limit, $offset);
+        $pager = new Pagination($offset, $limit, $totalRecords);
 
-        $response = $response->withHeader(HttpHelper::PAGING_RECORDS, $totalRecords);
-        $response = $response->withHeader(HttpHelper::PAGING_PAGES, $paging->getPageCount());
-        $response = $response->withHeader(HttpHelper::PAGING_PAGESIZE, $paging->getCurrentPageSize());
-        $response = $response->withHeader(HttpHelper::PAGING_PAGE, $paging->getCurrentPage());
-        $response = $response->withHeader(HttpHelper::PAGING_FIRST, $paging->getFirstRecord());
-        $response = $response->withHeader(HttpHelper::PAGING_LAST, $paging->getLastRecord());
+        $response = $response->withHeader(HttpHelper::PAGINATION_TOTAL_RECORDS, $totalRecords);
+        $response = $response->withHeader(HttpHelper::PAGINATION_FIRST_RECORD, $pager->firstRecord());
+        $response = $response->withHeader(HttpHelper::PAGINATION_LAST_RECORD, $pager->lastRecord());
+        $response = $response->withHeader(HttpHelper::PAGINATION_TOTAL_PAGES, $pager->totalPages());
+        $response = $response->withHeader(HttpHelper::PAGINATION_PAGE_SIZE, $pager->currentPageSize());
+        $response = $response->withHeader(HttpHelper::PAGINATION_PAGE_NUMBER, $pager->currentPageNumber());
 
         return $response;
 
@@ -145,7 +143,7 @@ class CollectionController
 
         $qBuilder = $conn->createQueryBuilder();
 
-        //$qParams = $request->getQueryParams();
+        //$qParams = $request->getQueryParams(); TODO add filtering params
 
         $qBuilder->select('count(*)')
             ->from('archive_collection', 'c')

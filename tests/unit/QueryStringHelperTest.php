@@ -7,6 +7,11 @@ use Kronofoto\Models\Model;
 
 class QueryStringHelperTest extends \Codeception\Test\Unit
 {
+    /* method names: 
+     * _eq_: equals
+     * _gt_: greater than
+     * _lt_: less than
+     */
     protected $container; 
 
     protected function _before()
@@ -159,6 +164,15 @@ class QueryStringHelperTest extends \Codeception\Test\Unit
         $this->assertEquals(0, $qs->getOffset());
     }
 
+    public function testGetOffset_lt_0()
+    {
+        $offset = -1;
+        $params = array('offset' => $offset);
+        $model = $this->getMockModel();
+        $qs = new QueryStringHelper($params, $model, $this->container);
+        $this->assertEquals(0, $qs->getOffset());
+    }
+
     public function testGetLimit()
     {
         $limit = 17;
@@ -177,7 +191,27 @@ class QueryStringHelperTest extends \Codeception\Test\Unit
         $this->assertEquals($defaultLimit, $qs->getLimit());
     }
 
-    public function testGetLimitCappedByMaxRecords()
+    public function testGetLimit_eq_0()
+    {
+        $limit = 0;
+        $params = array('limit' => $limit);
+        $model = $this->getMockModel();
+        $qs = new QueryStringHelper($params, $model, $this->container);
+        $defaultLimit = (int)$this->container['settings']['paging']['default_page_size'];
+        $this->assertEquals($defaultLimit, $qs->getLimit());
+    }
+
+    public function testGetLimit_lt_0()
+    {
+        $limit = -1;
+        $params = array('limit' => $limit);
+        $model = $this->getMockModel();
+        $qs = new QueryStringHelper($params, $model, $this->container);
+        $defaultLimit = (int)$this->container['settings']['paging']['default_page_size'];
+        $this->assertEquals($defaultLimit, $qs->getLimit());
+    }
+
+    public function testGetLimit_gt_maxRecords()
     {
         $limit = 999999;
         $maxRecords = (int)$this->container['settings']['paging']['max_records'];
