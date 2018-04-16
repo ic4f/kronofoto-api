@@ -10,11 +10,11 @@ class ItemModelTest extends \Codeception\Test\Unit
         $model = new ItemModel();
         $this->assertTrue($model->validateSort('id'));
         $this->assertTrue($model->validateSort('identifier'));
-        $this->assertTrue($model->validateSort('collection_id'));
+        $this->assertTrue($model->validateSort('collectionId'));
         $this->assertTrue($model->validateSort('latitude'));
         $this->assertTrue($model->validateSort('longitude'));
-        $this->assertTrue($model->validateSort('year_min'));
-        $this->assertTrue($model->validateSort('year_max'));
+        $this->assertTrue($model->validateSort('yearMin'));
+        $this->assertTrue($model->validateSort('yearMax'));
         $this->assertTrue($model->validateSort('created')); 
         $this->assertTrue($model->validateSort('modified'));
     }

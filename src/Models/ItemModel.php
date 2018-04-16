@@ -8,11 +8,11 @@ class ItemModel extends Model
         return [
             'id',
             'identifier',
-            'collection_id',
+            'collectionId',
             'latitude',
             'longitude',
-            'year_min',
-            'year_max',
+            'yearMin',
+            'yearMax',
             'created',
             'modified'
         ];

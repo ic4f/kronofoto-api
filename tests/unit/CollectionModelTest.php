@@ -9,15 +9,15 @@ class CollectionModelTest extends \Codeception\Test\Unit
         $model = new CollectionModel();
         $this->assertTrue($model->validateSort('id')); 
         $this->assertTrue($model->validateSort('name')); 
-        $this->assertTrue($model->validateSort('year_min')); 
-        $this->assertTrue($model->validateSort('year_max')); 
-        $this->assertTrue($model->validateSort('item_count')); 
-        $this->assertTrue($model->validateSort('is_published')); 
+        $this->assertTrue($model->validateSort('yearMin')); 
+        $this->assertTrue($model->validateSort('yearMax')); 
+        $this->assertTrue($model->validateSort('itemCount')); 
+        $this->assertTrue($model->validateSort('isPublished')); 
         $this->assertTrue($model->validateSort('created')); 
         $this->assertTrue($model->validateSort('modified')); 
-        $this->assertTrue($model->validateSort('donor_id')); 
-        $this->assertTrue($model->validateSort('donor_first_name')); 
-        $this->assertTrue($model->validateSort('donor_last_name')); 
+        $this->assertTrue($model->validateSort('donorId')); 
+        $this->assertTrue($model->validateSort('donorFirstName')); 
+        $this->assertTrue($model->validateSort('donorLastName')); 
     }
 
     public function testValidateBadSortCriteria()

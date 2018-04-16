@@ -19,15 +19,15 @@ class CollectionCest extends ControllerCest
         return [
             'id' => 'integer',
             'name' => 'string',
-            'year_min' => 'integer|null',
-            'year_max' => 'integer|null',
-            'item_count' => 'integer',
+            'yearMin' => 'integer|null',
+            'yearMax' => 'integer|null',
+            'itemCount' => 'integer',
             'created' => 'string',
             'modified' => 'string',
-            'featured_item_identifier' => 'string|null',
-            'donor_id' => 'integer',
-            'donor_first_name' => 'string',
-            'donor_last_name' => 'string'
+            'featuredItemIdentifier' => 'string|null',
+            'donorId' => 'integer',
+            'donorFirstName' => 'string',
+            'donorLastName' => 'string'
         ];
     }
 
@@ -95,35 +95,34 @@ class CollectionCest extends ControllerCest
             $expected_pageSize,
             $expected_pageNumber);
     }
-
     public function runTestSortYearMinAcs(ApiTester $I) 
     {
-        $this->runTestSort($I, 'year_min', false);
+        $this->runTestSort($I, 'yearMin', false);
     }
 
     public function runTestSortYearMinDesc(ApiTester $I) 
     {
-        $this->runTestSort($I, 'year_min', true);
+        $this->runTestSort($I, 'yearMin', true);
     }
 
     public function runTestSortYearMaxAcs(ApiTester $I) 
     {
-        $this->runTestSort($I, 'year_max', false);
+        $this->runTestSort($I, 'yearMax', false);
     }
 
     public function runTestSortYearMaxDesc(ApiTester $I) 
     {
-        $this->runTestSort($I, 'year_max', true);
+        $this->runTestSort($I, 'yearMax', true);
     }
 
     public function runTestSortItemCountAcs(ApiTester $I) 
     {
-        $this->runTestSort($I, 'item_count', false);
+        $this->runTestSort($I, 'itemCount', false);
     }
 
     public function runTestSortItemCountDesc(ApiTester $I) 
     {
-        $this->runTestSort($I, 'item_count', true);
+        $this->runTestSort($I, 'itemCount', true);
     }
 
     public function runTestSortCreatedAcs(ApiTester $I) 
@@ -148,11 +147,11 @@ class CollectionCest extends ControllerCest
 
     public function runTestSortDonorIdAcs(ApiTester $I) 
     {
-        $this->runTestSort($I, 'donor_id', false);
+        $this->runTestSort($I, 'donorId', false);
     }
 
     public function runTestSortDonorIdDesc(ApiTester $I) 
     {
-        $this->runTestSort($I, 'donor_id', true);
+        $this->runTestSort($I, 'donorId', true);
     }
 }

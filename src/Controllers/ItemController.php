@@ -31,12 +31,12 @@ class ItemController
             ->select(
                 'i.id',
                 'i.identifier',
-                'i.collection_id',
+                'i.collection_id as collectionId',
                 'i.latitude',
                 'i.longitude',
-                'i.year_min',
-                'i.year_max',
-                'i.is_published',
+                'i.year_min as yearMin',
+                'i.year_max as yearMax',
+                'i.is_published as isPublished',
                 'i.created',
                 'i.modified'
             )
@@ -75,12 +75,12 @@ class ItemController
             ->select(
                 'i.id',
                 'i.identifier',
-                'i.collection_id',
+                'i.collection_id as collectionId',
                 'i.latitude',
                 'i.longitude',
-                'i.year_min',
-                'i.year_max',
-                'i.is_published',
+                'i.year_min as yearMin',
+                'i.year_max as yearMax',
+                'i.is_published as isPublished',
                 'i.created',
                 'i.modified'
             )

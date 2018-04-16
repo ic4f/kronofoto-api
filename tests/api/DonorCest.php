@@ -17,11 +17,11 @@ class DonorCest extends ControllerCest
     protected function getListDataStructure()
     {
         return [
-            'user_id' => 'integer',
-            'first_name' => 'string',
-            'last_name' => 'string',
-            'collection_count' => 'integer',
-            'item_count' => 'integer',
+            'userId' => 'integer',
+            'firstName' => 'string',
+            'lastName' => 'string',
+            'collectionCount' => 'integer',
+            'itemCount' => 'integer',
             'created' => 'string',
             'modified' => 'string'
         ];
@@ -92,57 +92,57 @@ class DonorCest extends ControllerCest
 
     public function testPaging(ApiTester $I) 
     {
-        $this->runTestPaging($I, 42, 10, 'user_id', 86, 101);
+        $this->runTestPaging($I, 42, 10, 'userId', 86, 101);
     }
 
     public function runTestSortUserIdAcs(ApiTester $I) 
     {
-        $this->runTestSort($I, 'user_id', false);
+        $this->runTestSort($I, 'userId', false);
     }
 
     public function runTestSortUserIdDecs(ApiTester $I) 
     {
-        $this->runTestSort($I, 'user_id', true);
+        $this->runTestSort($I, 'userId', true);
     }
 
     public function runTestSortFirstNameAcs(ApiTester $I) 
     {
-        $this->runTestSort($I, 'first_name', false);
+        $this->runTestSort($I, 'firstName', false);
     }
 
     public function runTestSortFirstNameDecs(ApiTester $I) 
     {
-        $this->runTestSort($I, 'first_name', true);
+        $this->runTestSort($I, 'firstName', true);
     }
 
     public function runTestSortLastNameAcs(ApiTester $I) 
     {
-        $this->runTestSort($I, 'last_name', false);
+        $this->runTestSort($I, 'lastName', false);
     }
 
     public function runTestSortLastNameDecs(ApiTester $I) 
     {
-        $this->runTestSort($I, 'last_name', true);
+        $this->runTestSort($I, 'lastName', true);
     }
 
     public function runTestSortCollectionCountAcs(ApiTester $I) 
     {
-        $this->runTestSort($I, 'collection_count', false);
+        $this->runTestSort($I, 'collectionCount', false);
     }
 
     public function runTestSortCollectionCountDesc(ApiTester $I) 
     {
-        $this->runTestSort($I, 'collection_count', true);
+        $this->runTestSort($I, 'collectionCount', true);
     }
 
     public function runTestSortItemCountAcs(ApiTester $I) 
     {
-        $this->runTestSort($I, 'item_count', false);
+        $this->runTestSort($I, 'itemCount', false);
     }
 
     public function runTestSortItemCountDesc(ApiTester $I) 
     {
-        $this->runTestSort($I, 'item_count', true);
+        $this->runTestSort($I, 'itemCount', true);
     }
 
     public function runTestSortCreatedAcs(ApiTester $I) 

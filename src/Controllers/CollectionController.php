@@ -33,18 +33,18 @@ class CollectionController
             ->select(
                 'c.id', 
                 'c.name', 
-                'c.year_min', 
-                'c.year_max', 
-                'c.item_count', 
-                'c.is_published',
+                'c.year_min as yearMin', 
+                'c.year_max as yearMax', 
+                'c.item_count as itemCount', 
+                'c.is_published as isPublished',
                 'c.description',
                 'c.created',
                 'c.modified',
-                'c.featured_item_id',
-                'i.identifier as featured_item_identifier',
-                'c.donor_id',
-                'u.first_name as donor_first_name',
-                'u.last_name as donor_last_name'
+                'c.featured_item_id as fieaturedItemId',
+                'i.identifier as featuredItemIdentifier',
+                'c.donor_id as donorId',
+                'u.first_name as donorFirstName',
+                'u.last_name as donorLastName'
             )
             ->from('archive_collection', 'c')
             ->innerJoin('c', 'accounts_user', 'u', 'c.donor_id = u.id')
@@ -83,15 +83,15 @@ class CollectionController
             ->select(
                 'c.id', 
                 'c.name', 
-                'c.year_min', 
-                'c.year_max', 
-                'c.item_count', 
+                'c.year_min as yearMin', 
+                'c.year_max as yearMax', 
+                'c.item_count as itemCount', 
                 'c.created',
                 'c.modified',
-                'i.identifier as featured_item_identifier',
-                'c.donor_id',
-                'u.first_name as donor_first_name',
-                'u.last_name as donor_last_name'
+                'i.identifier as featuredItemIdentifier',
+                'c.donor_id as donorId',
+                'u.first_name as donorFirstName',
+                'u.last_name as donorLastName'
             )
             ->from('archive_collection', 'c')
             ->innerJoin('c', 'accounts_user', 'u', 'c.donor_id = u.id')

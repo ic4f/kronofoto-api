@@ -19,12 +19,12 @@ class ItemCest extends ControllerCest
         return [
             'id' => 'integer',
             'identifier' => 'string',
-            'collection_id' => 'integer',
+            'collectionId' => 'integer',
             'latitude' => 'integer|float',
             'longitude' => 'integer|float',
-            'year_min' => 'integer|null',
-            'year_max' => 'integer|null',
-            'is_published' => 'integer',
+            'yearMin' => 'integer|null',
+            'yearMax' => 'integer|null',
+            'isPublished' => 'integer',
             'created' => 'string',
             'modified' => 'string',
         ];
@@ -137,12 +137,12 @@ class ItemCest extends ControllerCest
 
     public function runTestSortCollectionAcs(ApiTester $I) 
     {
-        $this->runTestSort($I, 'collection_id', false);
+        $this->runTestSort($I, 'collectionId', false);
     }
 
     public function runTestSortCollectionDesc(ApiTester $I) 
     {
-        $this->runTestSort($I, 'collection_id', true);
+        $this->runTestSort($I, 'collectionId', true);
     }
 
     public function runTestSortLatitudeAcs(ApiTester $I) 
@@ -167,22 +167,22 @@ class ItemCest extends ControllerCest
 
     public function runTestSortYearMinAcs(ApiTester $I) 
     {
-        $this->runTestSort($I, 'year_min', false);
+        $this->runTestSort($I, 'yearMin', false);
     }
 
     public function runTestSortYearMinDesc(ApiTester $I) 
     {
-        $this->runTestSort($I, 'year_min', true);
+        $this->runTestSort($I, 'yearMin', true);
     }
 
     public function runTestSortYearMaxAcs(ApiTester $I) 
     {
-        $this->runTestSort($I, 'year_max', false);
+        $this->runTestSort($I, 'yearMax', false);
     }
 
     public function runTestSortYearMaxDesc(ApiTester $I) 
     {
-        $this->runTestSort($I, 'year_max', true);
+        $this->runTestSort($I, 'yearMax', true);
     }
 
     public function runTestSortCreatedAcs(ApiTester $I) 

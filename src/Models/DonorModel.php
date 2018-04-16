@@ -6,11 +6,11 @@ class DonorModel extends Model
     protected function getSortCriteria() 
     {
         return [
-            'user_id', 
-            'first_name',
-            'last_name',
-            'collection_count',
-            'item_count',
+            'userId', 
+            'firstName',
+            'lastName',
+            'collectionCount',
+            'itemCount',
             'created',
             'modified'
         ];

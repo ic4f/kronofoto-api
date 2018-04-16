@@ -29,11 +29,11 @@ class DonorController
 
         $qBuilder
             ->select(
-                'd.user_id',
-                'u.first_name',
-                'u.last_name',
-                'd.collection_count',
-                'd.item_count',
+                'd.user_id as userId',
+                'u.first_name as firstName',
+                'u.last_name as lastName',
+                'd.collection_count as collectionCount',
+                'd.item_count as itemCount',
                 'd.created',
                 'd.modified'
             )
@@ -71,11 +71,11 @@ class DonorController
 
         $qBuilder
             ->select(
-                'd.user_id',
-                'u.first_name',
-                'u.last_name',
-                'd.collection_count',
-                'd.item_count',
+                'd.user_id as userId',
+                'u.first_name as firstName',
+                'u.last_name as lastName',
+                'd.collection_count as collectionCount',
+                'd.item_count as itemCount',
                 'd.created',
                 'd.modified'
             )
