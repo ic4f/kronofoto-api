@@ -22,4 +22,6 @@ abstract class Model
     protected abstract function getSortCriteria();
 
     protected abstract function getFilterCriteria();
+
+    public abstract function getName();
 }

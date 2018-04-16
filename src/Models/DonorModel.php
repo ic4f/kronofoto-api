@@ -3,6 +3,8 @@ namespace Kronofoto\Models;
 
 class DonorModel extends Model
 {
+    public function getName() { return 'donor'; }
+
     protected function getSortCriteria() 
     {
         return [

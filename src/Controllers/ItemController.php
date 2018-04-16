@@ -3,31 +3,46 @@ namespace Kronofoto\Controllers;
 
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
-use Interop\Container\ContainerInterface;
 
 use Kronofoto\Models\ItemModel;
 use Kronofoto\QueryStringHelper;
+use Kronofoto\Pagination;
+use Kronofoto\HttpHelper;
 
-class ItemController 
+class ItemController extends Controller
 {
-    private $container;
-    private $model;
-
-    public function __construct(ContainerInterface $container)
+    public function getItems($request, $response, $args) 
     {
-        $this->container = $container;
-        $this->model = $this->container->ItemModel;
+        $select = function($qBuilder) { 
+            $qBuilder
+                ->select(
+                    'i.id',
+                    'i.identifier',
+                    'i.collection_id as collectionId',
+                    'i.latitude',
+                    'i.longitude',
+                    'i.year_min as yearMin',
+                    'i.year_max as yearMax',
+                    'i.is_published as isPublished',
+                    'i.created',
+                    'i.modified'
+                )
+                ->from('archive_item', 'i')
+                ->where('i.is_published = 1'); 
+        };
+        return $this->getRecords($request, $response, $args, $select);
     }
 
-    public function read(Request $request, Response $response, array $args) 
+    protected function getModel()
     {
+        return $this->container->ItemModel;
+    }
+
+    protected function selectOneRecord($queryBuilder, $args)
+    { 
         $id = $args['id'];
 
-        $conn = $this->container->db;
-
-        $qBuilder = $conn->createQueryBuilder();
-
-        $qBuilder
+        $queryBuilder
             ->select(
                 'i.id',
                 'i.identifier',
@@ -43,97 +58,45 @@ class ItemController
             ->from('archive_item', 'i')
             ->where('i.id = :id')
             ->setParameter('id', $id);
+    }
 
-        $stmt = $qBuilder->execute();
-        $result = $stmt->fetch();
+    protected function addFilterParams($queryBuilder, $queryStringHelper)
+    {
+        $filterParams = $queryStringHelper->getFilterParams();
+        foreach ($filterParams as $fp) {
+            $key= $fp['key'];
+            $value = $fp['value'];
 
-        if (!$result) {
-            $error = array(
-                'error' =>
-                array(
-                    'status' => '404',
-                    'message' => 'Requested item not found',
-                    'detail' => 'Invalid id'
-                )
-            );
-            return $response->withJson($error, 404);
-        }
-        else {
-            return $response->withJson($result);
+            if ($key == 'identifier') {
+                $value .= '%';
+                $queryBuilder
+                    ->andWhere(
+                        $queryBuilder->expr()->like($key, ":$key"))
+                        ->setParameter($key, "$value");
+            }
+
+            if ($key == 'year' || $key == 'before') {
+                $queryBuilder
+                    ->andWhere(
+                        $queryBuilder->expr()->lte('year_min', ':year_min'))
+                        ->setParameter('year_min', "$value");
+            }
+
+            if ($key == 'year' || $key == 'after') {
+                $queryBuilder
+                    ->andWhere(
+                        $queryBuilder->expr()->gte('year_max', ':year_max'))
+                        ->setParameter('year_max', "$value");
+            }
         }
     }
 
-    public function getItems(Request $request, Response $response, array $args) 
-    {
-        $conn = $this->container->db;
-
-        $qBuilder = $conn->createQueryBuilder();
-
-        $qParams = $request->getQueryParams();
-
-        $qBuilder
-            ->select(
-                'i.id',
-                'i.identifier',
-                'i.collection_id as collectionId',
-                'i.latitude',
-                'i.longitude',
-                'i.year_min as yearMin',
-                'i.year_max as yearMax',
-                'i.is_published as isPublished',
-                'i.created',
-                'i.modified'
-            )
-            ->from('archive_item', 'i')
-            ->where('i.is_published = 1'); 
-
-        $qs = new QueryStringHelper($qParams, $this->model, $this->container);
-        //
-        //TODO this will need refactoring
-        if ($qs->hasFilterParam()) {
-            $filterParams = $qs->getFilterParams();
-            foreach ($filterParams as $fp) {
-                $key= $fp['key'];
-                $value = $fp['value'];
-
-                if ($key == 'identifier') {
-                    $value .= '%';
-                    $qBuilder
-                        ->andWhere(
-                            $qBuilder->expr()->like($key, ":$key"))
-                            ->setParameter($key, "$value");
-                }
- 
-                if ($key == 'year' || $key == 'before') {
-                    $qBuilder
-                        ->andWhere(
-                            $qBuilder->expr()->lte('year_min', ':year_min'))
-                            ->setParameter('year_min', "$value");
-                }
-                
-                if ($key == 'year' || $key == 'after') {
-                    $qBuilder
-                        ->andWhere(
-                            $qBuilder->expr()->gte('year_max', ':year_max'))
-                            ->setParameter('year_max', "$value");
-                }
-           }
-        }
-
-        if ($qs->hasSortParam()) {
-            $qBuilder
-                ->orderBy($qs->getSortField(), $qs->getSortOrder());
-        }
-
-        $qBuilder
-            ->setFirstResult($qs->getOffset())
-            ->setMaxResults($qs->getLimit());
-
-        $stmt = $qBuilder->execute();
-
-        $result = $stmt->fetchAll();
-
-        return $response->withJson($result);
+    protected function selectCount($queryBuilder)
+    { 
+        $queryBuilder->select('count(*)')
+            ->from('archive_item')
+            //no joins for counting; but this could cause a bug (null related record)
+            ->where('is_published = 1'); //because for now this is for public site only
     }
 
     public function getDonorItems(Request $request, Response $response, array $args)

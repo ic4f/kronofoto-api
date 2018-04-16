@@ -3,6 +3,8 @@ namespace Kronofoto\Models;
 
 class CollectionModel extends Model
 {
+    public function getName() { return 'collection'; }
+    
     protected function getSortCriteria() 
     {
         return [
