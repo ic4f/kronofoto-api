@@ -35,14 +35,14 @@ class ItemCest extends ControllerCest
     public function testReadOne(ApiTester $I)
     {
         $expectedFields = 10;
-        $I->wantTo("get one record by id");
-        $id = 10;
-        $I->sendGET($this->getURL() . "/$id"); 
+        $I->wantTo("get one record by 'identifier' field");
+        $identifier = 'FI000326';
+        $I->sendGET($this->getURL() . "/$identifier"); 
         $this->checkResponseIsValid($I);
         $data = $I->grabDataFromResponseByJsonPath('$*');
         $I->assertEquals($expectedFields, count($data));
-        $I->assertEquals($id, $data[0]);
-        $I->assertEquals('FI000326', $data[1]);
+        $I->assertEquals(10, $data[0]); 
+        $I->assertEquals($identifier, $data[1]);
         $I->assertEquals(2, $data[2]);
         $I->assertEquals(0, $data[3]);
         $I->assertEquals(0, $data[4]);
@@ -55,7 +55,8 @@ class ItemCest extends ControllerCest
 
     public function testReadAnother(ApiTester $I)
     {
-        $this->runTestReadAnother($I, 20, 10);
+        $idIndex = 1; //not 0: se are using identifier field, not id
+        $this->runTestReadAnother($I, 'FI000327', 10, $idIndex);
     }
 
     public function testReadInvalid(ApiTester $I)

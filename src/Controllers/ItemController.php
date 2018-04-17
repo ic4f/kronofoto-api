@@ -40,7 +40,7 @@ class ItemController extends Controller
 
     protected function selectOneRecord($queryBuilder, $args)
     { 
-        $id = $args['id'];
+        $identifier = $args['id']; //not id
 
         $queryBuilder
             ->select(
@@ -56,8 +56,8 @@ class ItemController extends Controller
                 'i.modified'
             )
             ->from('archive_item', 'i')
-            ->where('i.id = :id')
-            ->setParameter('id', $id);
+            ->where('i.identifier = :identifier')
+            ->setParameter('identifier', $identifier);
     }
 
     protected function addFilterParams($queryBuilder, $queryStringHelper)

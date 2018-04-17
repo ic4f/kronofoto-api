@@ -59,14 +59,14 @@ abstract class ControllerCest
 
     /* --------------- helpers for subclasses ---------------- */
 
-    protected function runTestReadAnother(ApiTester $I, $id, $expectedFields)
+    protected function runTestReadAnother(ApiTester $I, $id, $expectedFields, $idIndex=0)
     {
         $I->wantTo("get another record by id");
         $I->sendGET($this->getURL() . "/$id"); 
         $this->checkResponseIsValid($I);
         $data = $I->grabDataFromResponseByJsonPath('$*');
         $I->assertEquals($expectedFields, count($data));
-        $I->assertEquals($id, $data[0]);
+        $I->assertEquals($id, $data[$idIndex]);
     }
 
     protected function runTestReadInvalid(ApiTester $I, $record, $field)
