@@ -26,7 +26,8 @@ class ItemModel extends Model
             'identifier',
             'year',
             'before',
-            'after'
+            'after',
+            'collection'
         ];
     }
 }

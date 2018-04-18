@@ -66,6 +66,15 @@ class ItemCest extends ControllerCest
 
     /* --------------- tests for lists of records ---------------- */
 
+    public function testFilterByCollection(ApiTester $I)
+    {
+        $collection = 2;
+        $expected = 13;
+        $I->wantTo("get items belonging to collection $collection" );
+        $I->sendGET($this->getURL() . "?filter[collection]=$collection"); 
+        $this->checkValidAndNumberOfRecords($I, $expected);
+    }
+ 
     public function testFilterByIdentifier(ApiTester $I)
     {
         $identifier = 'FI00429';
@@ -74,6 +83,7 @@ class ItemCest extends ControllerCest
         $I->sendGET($this->getURL() . "?filter[identifier]=$identifier"); 
         $this->checkValidAndNumberOfRecords($I, $expected);
     }
+
     public function testFilterGetItemsBeforeYear(ApiTester $I)
     {
         $year = 1870;

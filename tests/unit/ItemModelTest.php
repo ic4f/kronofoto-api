@@ -34,6 +34,7 @@ class ItemModelTest extends \Codeception\Test\Unit
         $this->assertTrue($model->validateFilter('year')); 
         $this->assertTrue($model->validateFilter('before')); 
         $this->assertTrue($model->validateFilter('after')); 
+        $this->assertTrue($model->validateFilter('collection')); 
     }
 
     public function testValidateBadFilterCriteria()

@@ -67,6 +67,13 @@ class ItemController extends Controller
             $key= $fp['key'];
             $value = $fp['value'];
 
+            if ($key == 'collection') {
+                $queryBuilder
+                    ->andWhere(
+                        $queryBuilder->expr()->eq('collection_id', ':collection_id'))
+                        ->setParameter('collection_id', "$value");
+            }
+
             if ($key == 'identifier') {
                 $value .= '%';
                 $queryBuilder
@@ -106,6 +113,7 @@ class ItemController extends Controller
 
     public function getCollectionItems(Request $request, Response $response, array $args) 
     {
+        //implement this now!
         echo 'collection items';
     }
 }
