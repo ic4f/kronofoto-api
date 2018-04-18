@@ -90,7 +90,8 @@ abstract class ControllerCest
         $expected_lastRecord,
         $expected_totalPages, 
         $expected_pageSize,
-        $expected_pageNumber)
+        $expected_currPageSize,
+        $expected_currPageNumber)
     {
         $I->wantTo("get pagination data via http headers");
         $I->sendGET($this->getURL() . "?offset=$offset&limit=$limit"); 
@@ -98,11 +99,12 @@ abstract class ControllerCest
         $data = $I->grabDataFromResponseByJsonPath('$*');
 
         $I->seeHttpHeader(HttpHelper::PAGINATION_TOTAL_RECORDS, $expected_totalRecords);
+        $I->seeHttpHeader(HttpHelper::PAGINATION_PAGE_SIZE, $expected_pageSize);
+        $I->seeHttpHeader(HttpHelper::PAGINATION_TOTAL_PAGES, $expected_totalPages);
         $I->seeHttpHeader(HttpHelper::PAGINATION_FIRST_RECORD, $expected_firstRecord);
         $I->seeHttpHeader(HttpHelper::PAGINATION_LAST_RECORD, $expected_lastRecord);
-        $I->seeHttpHeader(HttpHelper::PAGINATION_TOTAL_PAGES, $expected_totalPages);
-        $I->seeHttpHeader(HttpHelper::PAGINATION_PAGE_NUMBER, $expected_pageNumber);
-
+        $I->seeHttpHeader(HttpHelper::PAGINATION_CURRENT_PAGE_NUMBER, $expected_currPageNumber);
+        $I->seeHttpHeader(HttpHelper::PAGINATION_CURRENT_PAGE_SIZE, $expected_currPageSize);
     }
 
     protected function runTestPaging(

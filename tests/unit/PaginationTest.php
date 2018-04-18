@@ -2,7 +2,7 @@
 namespace Kronofoto\Test;
 
 use Kronofoto\Pagination;
-//TODO add all assertions to all tests: we are testing validity of state oafter all.
+//TODO add all assertions to all tests: we are testing validity of state after all.
 
 class PaginationTest extends \Codeception\Test\Unit
 {
@@ -13,6 +13,7 @@ class PaginationTest extends \Codeception\Test\Unit
 
     /* method names: 
      * _eq_: equals
+     * _ne_: not equal
      * _gt_: greater than
      * _lt_: less than
      */
@@ -39,6 +40,7 @@ class PaginationTest extends \Codeception\Test\Unit
         $this->assertEquals(1, $p->firstRecord());
         $this->assertEquals(10, $p->lastRecord());
         $this->assertEquals(10, $p->totalPages());
+        $this->assertEquals($limit, $p->pageSize());
         $this->assertEquals(10, $p->currentPageSize());
         $this->assertEquals(1, $p->currentPageNumber());
     }
@@ -55,6 +57,7 @@ class PaginationTest extends \Codeception\Test\Unit
         $this->assertEquals(1, $p->firstRecord()); //under test
         $this->assertEquals(10, $p->lastRecord());
         $this->assertEquals(100, $p->totalPages());
+        $this->assertEquals($limit, $p->pageSize());
         $this->assertEquals(10, $p->currentPageSize());
         $this->assertEquals(1, $p->currentPageNumber());
     }
@@ -70,6 +73,7 @@ class PaginationTest extends \Codeception\Test\Unit
         $this->assertEquals(2, $p->firstRecord()); //under test
         $this->assertEquals(11, $p->lastRecord());
         $this->assertEquals(-1, $p->totalPages());
+        $this->assertEquals($limit, $p->pageSize());
         $this->assertEquals(10, $p->currentPageSize());
         $this->assertEquals(-1, $p->currentPageNumber());
     }
@@ -85,10 +89,11 @@ class PaginationTest extends \Codeception\Test\Unit
         $this->assertEquals(0, $p->firstRecord()); //under test
         $this->assertEquals(0, $p->lastRecord());
         $this->assertEquals(1, $p->totalPages());
+        $this->assertEquals($limit, $p->pageSize());
         $this->assertEquals(0, $p->currentPageSize());
         $this->assertEquals(1, $p->currentPageNumber());
     }
-
+ 
     public function testFirstRecord_total_eq_0()
     {
         $total = 0;
@@ -100,6 +105,7 @@ class PaginationTest extends \Codeception\Test\Unit
         $this->assertEquals(0, $p->firstRecord()); //under test
         $this->assertEquals(0, $p->lastRecord());
         $this->assertEquals(1, $p->totalPages());
+        $this->assertEquals($limit, $p->pageSize());
         $this->assertEquals(0, $p->currentPageSize());
         $this->assertEquals(1, $p->currentPageNumber());
     }
@@ -116,6 +122,7 @@ class PaginationTest extends \Codeception\Test\Unit
         $this->assertEquals(1, $p->firstRecord());
         $this->assertEquals(20, $p->lastRecord()); //under test
         $this->assertEquals(50, $p->totalPages());
+        $this->assertEquals($limit, $p->pageSize());
         $this->assertEquals(20, $p->currentPageSize());
         $this->assertEquals(1, $p->currentPageNumber());
     }
@@ -131,6 +138,7 @@ class PaginationTest extends \Codeception\Test\Unit
         $this->assertEquals(1, $p->firstRecord());
         $this->assertEquals(100, $p->lastRecord()); //under test
         $this->assertEquals(1, $p->totalPages());
+        $this->assertEquals($limit, $p->pageSize());
         $this->assertEquals(100, $p->currentPageSize());
         $this->assertEquals(1, $p->currentPageNumber());
     }
@@ -146,6 +154,7 @@ class PaginationTest extends \Codeception\Test\Unit
         $this->assertEquals(96, $p->firstRecord());
         $this->assertEquals(100, $p->lastRecord()); //under test
         $this->assertEquals(-1, $p->totalPages());
+        $this->assertEquals($limit, $p->pageSize());
         $this->assertEquals(5, $p->currentPageSize());
         $this->assertEquals(-1, $p->currentPageNumber());
     }
@@ -162,6 +171,7 @@ class PaginationTest extends \Codeception\Test\Unit
         $this->assertEquals(1, $p->firstRecord());
         $this->assertEquals(10, $p->lastRecord());
         $this->assertEquals(10, $p->totalPages()); //under test
+        $this->assertEquals($limit, $p->pageSize());
         $this->assertEquals(10, $p->currentPageSize());
         $this->assertEquals(1, $p->currentPageNumber());
     }
@@ -177,6 +187,7 @@ class PaginationTest extends \Codeception\Test\Unit
         $this->assertEquals(1, $p->firstRecord());
         $this->assertEquals(10, $p->lastRecord());
         $this->assertEquals(10, $p->totalPages()); //under test
+        $this->assertEquals($limit, $p->pageSize());
         $this->assertEquals(10, $p->currentPageSize());
         $this->assertEquals(1, $p->currentPageNumber());
     }
@@ -192,12 +203,31 @@ class PaginationTest extends \Codeception\Test\Unit
         $this->assertEquals(0, $p->firstRecord());
         $this->assertEquals(0, $p->lastRecord());
         $this->assertEquals(1, $p->totalPages()); //under test
-        $this->assertEquals(0, $p->currentPageSize());
+        $this->assertEquals($limit, $p->pageSize());
         $this->assertEquals(0, $p->currentPageSize());
         $this->assertEquals(1, $p->currentPageNumber());
     }
     
     //------------------ test pageSize ------------------//
+    //TODO
+    //
+    //------------------ test currentPageSize ------------------//
+    public function testPageSize_ne_currPageSize()
+    {
+        $total = 17;
+        $offset = 10;
+        $limit = 10;
+        $p = new Pagination($offset, $limit, $total);
+        $this->assertEquals($total, $p->totalRecords());
+        $this->assertEquals(11, $p->firstRecord());
+        $this->assertEquals(17, $p->lastRecord());
+        $this->assertEquals(2, $p->totalPages());
+        $this->assertEquals($limit, $p->pageSize()); //under test
+        $this->assertEquals(7, $p->currentPageSize()); 
+        $this->assertEquals(2, $p->currentPageNumber());
+    }
+
+    //------------------ test currentPageSize ------------------//
     public function testCurrentPageSize()
     {
         $total = 100;
@@ -209,6 +239,7 @@ class PaginationTest extends \Codeception\Test\Unit
         $this->assertEquals(1, $p->firstRecord());
         $this->assertEquals(10, $p->lastRecord());
         $this->assertEquals(10, $p->totalPages());
+        $this->assertEquals($limit, $p->pageSize());
         $this->assertEquals(10, $p->currentPageSize()); //under test
         $this->assertEquals(1, $p->currentPageNumber());
     }
@@ -224,12 +255,13 @@ class PaginationTest extends \Codeception\Test\Unit
         $this->assertEquals(91, $p->firstRecord());
         $this->assertEquals(95, $p->lastRecord());
         $this->assertEquals(10, $p->totalPages());
+        $this->assertEquals($limit, $p->pageSize());
         $this->assertEquals(5, $p->currentPageSize()); //under test
         $this->assertEquals(10, $p->currentPageNumber());
     }
   
    
-    //------------------ test pageNumber ------------------//
+    //------------------ test currentPageNumber ------------------//
     public function testCurrentPageNumber()
     {
         $total = self::TOTAL;
@@ -241,6 +273,7 @@ class PaginationTest extends \Codeception\Test\Unit
         $this->assertEquals(1, $p->firstRecord());
         $this->assertEquals(10, $p->lastRecord());
         $this->assertEquals(100, $p->totalPages());
+        $this->assertEquals($limit, $p->pageSize());
         $this->assertEquals(10, $p->currentPageSize());
         $this->assertEquals(1, $p->currentPageNumber()); //under test
     }
@@ -256,6 +289,7 @@ class PaginationTest extends \Codeception\Test\Unit
         $this->assertEquals(6, $p->firstRecord());
         $this->assertEquals(15, $p->lastRecord());
         $this->assertEquals(-1, $p->totalPages());
+        $this->assertEquals($limit, $p->pageSize());
         $this->assertEquals(10, $p->currentPageSize());
         $this->assertEquals(-1, $p->currentPageNumber()); //under test
     }
@@ -271,6 +305,7 @@ class PaginationTest extends \Codeception\Test\Unit
         $this->assertEquals(11, $p->firstRecord());
         $this->assertEquals(20, $p->lastRecord());
         $this->assertEquals(100, $p->totalPages());
+        $this->assertEquals($limit, $p->pageSize());
         $this->assertEquals(10, $p->currentPageSize());
         $this->assertEquals(2, $p->currentPageNumber()); //under test
     }
@@ -286,6 +321,7 @@ class PaginationTest extends \Codeception\Test\Unit
         $this->assertEquals(16, $p->firstRecord());
         $this->assertEquals(25, $p->lastRecord());
         $this->assertEquals(-1, $p->totalPages());
+        $this->assertEquals($limit, $p->pageSize());
         $this->assertEquals(10, $p->currentPageSize());
         $this->assertEquals(-1, $p->currentPageNumber()); //under test
     }

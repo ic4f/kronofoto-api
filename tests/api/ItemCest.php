@@ -69,7 +69,7 @@ class ItemCest extends ControllerCest
     public function testFilterByCollection(ApiTester $I)
     {
         $collection = 2;
-        $expected = 13;
+        $expected = 15;
         $I->wantTo("get items belonging to collection $collection" );
         $I->sendGET($this->getURL() . "?filter[collection]=$collection"); 
         $this->checkValidAndNumberOfRecords($I, $expected);
@@ -107,7 +107,7 @@ class ItemCest extends ControllerCest
     {
         $year1 = 1901;
         $year2 = 1903;
-        $expected = 10;
+        $expected = 11;
         $I->wantTo("get items dated between $year1 and $year2");
         $I->sendGET($this->getURL() . "?filter[after]=$year1&filter[before]=$year2"); 
         $this->checkValidAndNumberOfRecords($I, $expected);
@@ -124,7 +124,7 @@ class ItemCest extends ControllerCest
     
     public function testPaging(ApiTester $I) 
     {
-        $this->runTestPaging($I, 42, 10, 'id', 47, 56);
+        $this->runTestPaging($I, 42, 10, 'id', 43, 52);
     }
 
     public function runTestSortIdAcs(ApiTester $I) 

@@ -1,13 +1,21 @@
 <?php
 namespace Kronofoto;
 
+/* 
+    Takes offset, limit, and totalRecords as input >>
+    and calculates pagination values to be sent to the client.
+    Offset and limit have been validated (but not against totalRecords).
+ */
 class Pagination
 {
-    private $totalRecords;
-    private $firstRecord;
-    private $lastRecord;
-    private $totalPages;
-    private $pageNumber;
+    private $totalRecords;  //overall
+    private $pageSize;      //overall (not current page: current could be smaller if it's last)
+    private $totalPages;    //overall (includes last page which may be smaller)
+
+    private $firstRecord;    //on current page
+    private $lastRecord;     //on current page
+    private $currPageNumber; //current page
+    private $currPageSize;   //current page
 
     /* can assume:
      * offset >= 0 
@@ -30,43 +38,45 @@ class Pagination
     public function __construct($offset, $limit, $totalRecords)
     {
         $this->totalRecords = $totalRecords;
-        $this->data = array();
+        $this->pageSize = $limit; //this has been validated
         $this->loadData($offset, $limit);
     }
 
     public function totalRecords() { return $this->totalRecords; }
 
+    public function pageSize() { return $this->pageSize; }
+
+    public function totalPages() { return $this->totalPages; }
+
     public function firstRecord() { return $this->firstRecord; }
 
     public function lastRecord() { return $this->lastRecord; }
 
-    public function totalPages() { return $this->totalPages; }
+    public function currentPageNumber() { return $this->currPageNumber; }
 
-    public function currentPageSize() { return $this->pageSize; }
+    public function currentPageSize() { return $this->currPageSize; }
 
-    public function currentPageNumber() { return $this->pageNumber; }
-
-    //TODO: refactor this logic
     private function loadData($offset, $limit) 
     {
+        //check if there's anything to display
         if ($offset >= $this->totalRecords) {
             $this->firstRecord = 0;
             $this->lastRecord = 0;
             $this->totalPages = 1; //1 page with 0 records
-            $this->pageSize = 0;
-            $this->pageNumber = 1;
+            $this->currPageNumber = 1;
+            $this->currPageSize = 0;
         } else {
             $this->firstRecord = $offset + 1;
             $this->lastRecord = min($offset + $limit, $this->totalRecords);
-            $this->pageSize = $this->lastRecord - $this->firstRecord + 1;
+            $this->currPageSize = $this->lastRecord - $this->firstRecord + 1;
 
             // see top of file: note on arbitrary offsets 
             if ($offset % $limit == 0) {
                 $this->totalPages = ceil($this->totalRecords / $limit);
-                $this->pageNumber = ceil($offset / $limit) + 1;
+                $this->currPageNumber = ceil($offset / $limit) + 1;
             } else {
                 $this->totalPages = -1;
-                $this->pageNumber = -1;
+                $this->currPageNumber = -1;
             }
         }
     }

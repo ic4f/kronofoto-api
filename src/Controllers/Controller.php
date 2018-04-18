@@ -83,10 +83,12 @@ abstract class Controller
         $totalRecords = $this->getRecordsCount($queryStringHelper);
         $pager = new Pagination($offset, $limit, $totalRecords);
         $response = $response->withHeader(HttpHelper::PAGINATION_TOTAL_RECORDS, $totalRecords);
+        $response = $response->withHeader(HttpHelper::PAGINATION_PAGE_SIZE, $pager->pageSize());
+        $response = $response->withHeader(HttpHelper::PAGINATION_TOTAL_PAGES, $pager->totalPages());
         $response = $response->withHeader(HttpHelper::PAGINATION_FIRST_RECORD, $pager->firstRecord());
         $response = $response->withHeader(HttpHelper::PAGINATION_LAST_RECORD, $pager->lastRecord());
-        $response = $response->withHeader(HttpHelper::PAGINATION_TOTAL_PAGES, $pager->totalPages());
-        $response = $response->withHeader(HttpHelper::PAGINATION_PAGE_NUMBER, $pager->currentPageNumber());
+        $response = $response->withHeader(HttpHelper::PAGINATION_CURRENT_PAGE_NUMBER, $pager->currentPageNumber());
+        $response = $response->withHeader(HttpHelper::PAGINATION_CURRENT_PAGE_SIZE, $pager->currentPageSize());
         return $response;
     }
 
