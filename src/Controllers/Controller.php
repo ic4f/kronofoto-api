@@ -98,12 +98,11 @@ abstract class Controller
     private function getRecordsCount($queryStringHelper)
     {
         $qBuilder = $this->getQueryBuilder();
+        $this->selectCount($qBuilder);
 
         if ($queryStringHelper->hasFilterParam()) {
             $this->addFilterParams($qBuilder, $queryStringHelper); 
         }
-
-        $this->selectCount($qBuilder);
         $stmt = $qBuilder->execute();
         return $stmt->fetchColumn(0);
     }

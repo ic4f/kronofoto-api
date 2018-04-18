@@ -59,9 +59,10 @@ class DonorController extends Controller
     protected function selectCount($queryBuilder)
     {
         $queryBuilder->select('count(*)')
-            ->from('archive_collection', 'c')
-            //no joins for counting; but this could cause a bug (null related record)
-            ->where('c.is_published = 1'); //because for now this is for public site only
+            ->from('archive_donor', 'd')
+            //a join to accommodate filtering on the user table
+                ->innerJoin('d', 'accounts_user', 'u', 'd.user_id = u.id')
+                ->where('1 = 1'); 
     }
 
     protected function addFilterParams($queryBuilder, $queryStringHelper)
