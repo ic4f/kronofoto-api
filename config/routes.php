@@ -19,3 +19,5 @@ $app->get($base . '/donors',                  'Kronofoto\Controllers\DonorContro
 //collections
 $app->get($base . '/collections',             'Kronofoto\Controllers\CollectionController:getCollections');
 //$app->get($base . '/donors/{id}/collections', 'Kronofoto\CollectionController:getDonorCollections');
+//
+$app->get($base . '/page/{slug}',               'Kronofoto\Controllers\PageController:read');

@@ -8,6 +8,7 @@ use Pimple\Container;
 use Kronofoto\Models\CollectionModel;
 use Kronofoto\Models\DonorModel;
 use Kronofoto\Models\ItemModel;
+use Kronofoto\Models\PageModel;
 
 class ModelServiceProvider implements ServiceProviderInterface
 {
@@ -16,5 +17,6 @@ class ModelServiceProvider implements ServiceProviderInterface
         $container['CollectionModel'] = new CollectionModel();
         $container['DonorModel'] = new DonorModel();
         $container['ItemModel'] = new ItemModel();
+        $container['PageModel'] = new PageModel();
     }
 }
