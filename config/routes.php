@@ -15,6 +15,7 @@ $app->get($base . '/items',                   'Kronofoto\Controllers\ItemControl
 //
 //donors
 $app->get($base . '/donors',                  'Kronofoto\Controllers\DonorController:getDonors');
+$app->get($base . '/alldonors',               'Kronofoto\Controllers\DonorController:getAllDonors');
 
 //collections
 $app->get($base . '/collections',             'Kronofoto\Controllers\CollectionController:getCollections');

@@ -60,6 +60,15 @@ class DonorCest extends ControllerCest
 
     /* --------------- tests for lists of records ---------------- */
 
+    public function testGetAll(ApiTester $I)
+    {
+        $expected = 296;
+        $I->wantTo("get all records");
+        $I->sendGET($this->baseUrl . "alldonors");
+        $this->checkValidAndNumberOfRecords($I, $expected);
+    }
+
+
     public function testFilterByFirstName(ApiTester $I)
     {
         $first_name = 'sh';

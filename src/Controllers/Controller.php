@@ -44,7 +44,7 @@ abstract class Controller
         }
     }
 
-    protected function getRecords($request, $response, $args, $select) 
+    protected function getRecords($request, $response, $args, $select, $paging=True) 
     {
         $qBuilder = $this->getQueryBuilder();
         $qParams = $request->getQueryParams();
@@ -65,19 +65,24 @@ abstract class Controller
         }
 
         //add paging
-        $limit = $qs->getLimit();
-        $offset = $qs->getOffset();
-        $qBuilder
-            ->setFirstResult($offset)
-            ->setMaxResults($limit);
+        if ($paging) {
+            $limit = $qs->getLimit();
+            $offset = $qs->getOffset();
+            $qBuilder
+                ->setFirstResult($offset)
+                ->setMaxResults($limit);
+        }
 
         //execute
         $stmt = $qBuilder->execute();
         $result = $stmt->fetchAll();
-        $response = $this->setPagingHeaders($response, $limit, $offset, $qs);
+
+        if ($paging) {
+            $response = $this->setPagingHeaders($response, $limit, $offset, $qs);
+        }
         return $response->withJson($result);
     }
- 
+
     protected function setPagingHeaders($response, $limit, $offset, $queryStringHelper) 
     {
         $totalRecords = $this->getRecordsCount($queryStringHelper);

@@ -11,6 +11,27 @@ use Kronofoto\HttpHelper;
 
 class DonorController extends Controller
 {
+    public function getAllDonors($request, $response, $args) 
+    {
+        $select = function($qBuilder) {
+            $qBuilder
+                ->select(
+                    'd.user_id as userId',
+                    'u.first_name as firstName',
+                    'u.last_name as lastName',
+                    'd.collection_count as collectionCount',
+                    'd.item_count as itemCount',
+                    'd.created',
+                    'd.modified'
+                )
+                ->from('archive_donor', 'd')
+                ->innerJoin('d', 'accounts_user', 'u', 'd.user_id = u.id')
+                ->where('1 = 1'); 
+        };
+        //do not include paging
+        return $this->getRecords($request, $response, $args, $select, False);
+    }
+
     public function getDonors($request, $response, $args) 
     {
         $select = function($qBuilder) {
