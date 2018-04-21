@@ -11,6 +11,35 @@ use Kronofoto\HttpHelper;
 
 class ItemController extends Controller
 {
+
+    //TODO consider factoring out into separate controller
+    public function getItemMetadata($request, $response, $args) 
+    {
+        $id = $args['id']; 
+
+        $qBuilder = $this->getQueryBuilder();
+
+        $qParams = $request->getQueryParams();
+        $qs = new QueryStringHelper($qParams, $this->model, $this->container);
+
+        $qBuilder
+            ->select(
+                'm.value',
+                'm.element_id',
+                'e.name as element'
+            )
+            ->from('archive_itemmetadata', 'm')
+            ->innerJoin('m', 'archive_metadataelement', 'e', 'm.element_id = e.id')
+            ->where('m.item_id = :id')
+            ->setParameter('id', $id);
+
+
+        //execute
+        $stmt = $qBuilder->execute();
+        $result = $stmt->fetchAll();
+        return $response->withJson($result);
+    }
+
     public function getItems($request, $response, $args) 
     {
         $select = function($qBuilder) { 
@@ -40,7 +69,7 @@ class ItemController extends Controller
 
     protected function selectOneRecord($queryBuilder, $args)
     { 
-        $identifier = $args['id']; //not id
+        $identifier = $args['identifier']; //not id
 
         $queryBuilder
             ->select(

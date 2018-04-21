@@ -97,7 +97,7 @@ abstract class Controller
         return $response;
     }
 
-    private function getQueryBuilder()
+    protected function getQueryBuilder()
     {
         return $this->container->db->createQueryBuilder();
     }

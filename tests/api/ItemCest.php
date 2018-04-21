@@ -64,6 +64,25 @@ class ItemCest extends ControllerCest
         $this->runTestReadInvalid($I, 'item', 'id');
     }
 
+    /* --------------- tests for metadata ---------------- */
+    public function testGetMetadataForItem(ApiTester $I)
+    {    
+        $I->wantTo("get all metadata for one record");
+        $id = 30;
+        $expectedRecords = 3;
+        $url = $this->getUrl() . "/$id/metadata";
+
+        $I->sendGET($url);
+        $this->checkResponseIsValid($I);
+        $data = $I->grabDataFromResponseByJsonPath('$*');
+        $I->assertEquals($expectedRecords, count($data));
+        $I->assertEquals('Durant', $data[1]['value']); 
+        $I->assertEquals('IA', $data[2]['value']); 
+    }
+
+
+
+
     /* --------------- tests for lists of records ---------------- */
 
     public function testFilterByCollection(ApiTester $I)

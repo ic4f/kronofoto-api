@@ -1,11 +1,15 @@
 <?php
 $base = '/api';
 
-//get one record by id
-$app->get($base . '/items/{id}',             'Kronofoto\Controllers\ItemController:read');
+$app->get($base . '/items/{id}/metadata',    'Kronofoto\Controllers\ItemController:getItemMetadata');
+//get one record by id or identifier (item)
+$app->get($base . '/items/{identifier}',     'Kronofoto\Controllers\ItemController:read');
 $app->get($base . '/donors/{id}',            'Kronofoto\Controllers\DonorController:read');
 $app->get($base . '/collections/{id}',       'Kronofoto\Controllers\CollectionController:read');
-//
+
+//get metadata 
+
+
 ////all 'get records' queries accecpt optional querystrings
 //
 //items
