@@ -25,7 +25,7 @@ class ItemController extends Controller
         $qBuilder
             ->select(
                 'm.value',
-                'm.element_id',
+                'm.element_id as elementId',
                 'e.name as element'
             )
             ->from('archive_itemmetadata', 'm')
