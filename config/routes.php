@@ -1,7 +1,8 @@
 <?php
 $base = '/api';
 
-$app->get($base . '/items/{id}/metadata',    'Kronofoto\Controllers\ItemController:getItemMetadata');
+$app->get($base . '/items/{identifier}/metadata', 'Kronofoto\Controllers\ItemController:getItemMetadata');
+
 //get one record by id or identifier (item)
 $app->get($base . '/items/{identifier}',     'Kronofoto\Controllers\ItemController:read');
 $app->get($base . '/donors/{id}',            'Kronofoto\Controllers\DonorController:read');

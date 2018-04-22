@@ -68,9 +68,9 @@ class ItemCest extends ControllerCest
     public function testGetMetadataForItem(ApiTester $I)
     {    
         $I->wantTo("get all metadata for one record");
-        $id = 30;
-        $expectedRecords = 3;
-        $url = $this->getUrl() . "/$id/metadata";
+        $identifier = 'FI001262';
+        $expectedRecords = 6;
+        $url = $this->getUrl() . "/$identifier/metadata";
 
         $I->sendGET($url);
         $this->checkResponseIsValid($I);

@@ -15,7 +15,7 @@ class ItemController extends Controller
     //TODO consider factoring out into separate controller
     public function getItemMetadata($request, $response, $args) 
     {
-        $id = $args['id']; 
+        $identifier = $args['identifier'];
 
         $qBuilder = $this->getQueryBuilder();
 
@@ -30,8 +30,9 @@ class ItemController extends Controller
             )
             ->from('archive_itemmetadata', 'm')
             ->innerJoin('m', 'archive_metadataelement', 'e', 'm.element_id = e.id')
-            ->where('m.item_id = :id')
-            ->setParameter('id', $id);
+            ->innerJoin('m', 'archive_item', 'i', 'm.item_id = i.id')
+            ->where('i.identifier = :identifier')
+            ->setParameter('identifier', $identifier);
 
 
         //execute
