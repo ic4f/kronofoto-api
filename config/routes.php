@@ -1,29 +1,64 @@
 <?php
 $base = '/api';
 
-$app->get($base . '/items/{identifier}/metadata', 'Kronofoto\Controllers\ItemController:getItemMetadata');
+//get item by identifier
+$app->get($base . 
+    '/items/{identifier}',     
+    'Kronofoto\Controllers\ItemController:read'
+);
 
-//get one record by id or identifier (item)
-$app->get($base . '/items/{identifier}',     'Kronofoto\Controllers\ItemController:read');
-$app->get($base . '/donors/{id}',            'Kronofoto\Controllers\DonorController:read');
-$app->get($base . '/collections/{id}',       'Kronofoto\Controllers\CollectionController:read');
+//get donor by id
+$app->get($base . 
+    '/donors/{id}',            
+    'Kronofoto\Controllers\DonorController:read'
+);
 
-//get metadata 
+//get collection by id
+$app->get($base . 
+    '/collections/{id}',       
+    'Kronofoto\Controllers\CollectionController:read'
+);
 
+//get collection by item identifier
+$app->get($base . 
+    '/items/{identifier}/collection',  
+    'Kronofoto\Controllers\CollectionController:getItemCollection'
+);
 
-////all 'get records' queries accecpt optional querystrings
-//
-//items
-$app->get($base . '/items',                   'Kronofoto\Controllers\ItemController:getItems');
-//$app->get($base . '/donors/{id}/items',       'Kronofoto\ItemController:getDonorItems');
-//$app->get($base . '/collections/{id}/items',  'Kronofoto\ItemController:getCollectionItems');
-//
-//donors
-$app->get($base . '/donors',                  'Kronofoto\Controllers\DonorController:getDonors');
-$app->get($base . '/alldonors',               'Kronofoto\Controllers\DonorController:getAllDonors');
+//get item metadata
+$app->get($base . 
+    '/items/{identifier}/metadata', 
+    'Kronofoto\Controllers\ItemController:getItemMetadata'
+);
 
-//collections
-$app->get($base . '/collections',             'Kronofoto\Controllers\CollectionController:getCollections');
-//$app->get($base . '/donors/{id}/collections', 'Kronofoto\CollectionController:getDonorCollections');
-//
-$app->get($base . '/page/{slug}',               'Kronofoto\Controllers\PageController:read');
+//get page by address slug
+$app->get($base . 
+    '/page/{slug}',
+    'Kronofoto\Controllers\PageController:read'
+);
+
+//all 'get records' queries accecpt optional querystrings
+
+//get items
+$app->get($base . 
+    '/items',
+    'Kronofoto\Controllers\ItemController:getItems'
+);
+
+//get donors
+$app->get($base . 
+    '/donors',
+    'Kronofoto\Controllers\DonorController:getDonors'
+);
+
+//get all donors (no pagination)
+$app->get($base . 
+    '/alldonors',
+    'Kronofoto\Controllers\DonorController:getAllDonors'
+);
+
+//get collections
+$app->get($base . 
+    '/collections',
+    'Kronofoto\Controllers\CollectionController:getCollections'
+);

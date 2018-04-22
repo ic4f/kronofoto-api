@@ -19,9 +19,6 @@ class ItemController extends Controller
 
         $qBuilder = $this->getQueryBuilder();
 
-        $qParams = $request->getQueryParams();
-        $qs = new QueryStringHelper($qParams, $this->model, $this->container);
-
         $qBuilder
             ->select(
                 'm.value',

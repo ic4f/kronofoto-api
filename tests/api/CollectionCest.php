@@ -31,6 +31,19 @@ class CollectionCest extends ControllerCest
         ];
     }
 
+    public function testGetItemCollection(ApiTester $I)
+    {    
+        $I->wantTo("get a collecton by an item's identifier");
+        $identifier = 'FI001262';
+        $url = $this->baseUrl . "items/$identifier/collection";
+
+        $I->sendGET($url);
+        $this->checkResponseIsValid($I);
+        $data = $I->grabDataFromResponseByJsonPath('$*');
+        $I->assertEquals(3, $data[0]['id']);
+    }
+
+
     /* --------------- tests for one record ---------------- */
 
     public function testReadOne(ApiTester $I)

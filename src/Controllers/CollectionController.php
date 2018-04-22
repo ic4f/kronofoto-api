@@ -9,6 +9,7 @@ use Kronofoto\QueryStringHelper;
 use Kronofoto\Pagination;
 use Kronofoto\HttpHelper;
 
+//TODO: refactor query building 
 class CollectionController extends Controller
 { 
     public function getCollections($request, $response, $args) 
@@ -35,7 +36,41 @@ class CollectionController extends Controller
         };
         return $this->getRecords($request, $response, $args, $select);
     }
-    
+
+    public function getItemCollection($request, $response, $args) 
+    {
+        $identifier = $args['identifier'];
+
+        $qBuilder = $this->getQueryBuilder();
+
+        $qBuilder
+            ->select(
+                'c.id', 
+                'c.name', 
+                'c.year_min as yearMin', 
+                'c.year_max as yearMax', 
+                'c.item_count as itemCount', 
+                'c.is_published as isPublished',
+                'c.description',
+                'c.created',
+                'c.modified',
+                'c.donor_id as donorId',
+                'u.first_name as donorFirstName',
+                'u.last_name as donorLastName'
+            )
+            ->from('archive_collection', 'c')
+            ->innerJoin('c', 'accounts_user', 'u', 'c.donor_id = u.id')
+            ->innerJoin('c', 'archive_item', 'i', 'c.id = i.collection_id')
+            ->where('i.identifier = :identifier')
+            ->setParameter('identifier', $identifier);
+
+        //execute
+        $stmt = $qBuilder->execute();
+        $result = $stmt->fetchAll();
+        return $response->withJson($result);
+    }
+
+   
     protected function getModel()
     {
         return $this->container->CollectionModel;
