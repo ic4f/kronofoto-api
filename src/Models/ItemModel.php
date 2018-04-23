@@ -30,5 +30,15 @@ class ItemModel extends Model
             'collection'
         ];
     }
+
+    public function getDefaultSortField()
+    {
+        return 'yearMin';
+    }
+
+    public function getDefaultSortOrder()
+    {
+        return 'asc';
+    }
 }
 

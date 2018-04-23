@@ -70,6 +70,16 @@ class QueryStringHelper
         return $sort;
     }
 
+    public function getDefaultSortField()
+    {
+        return $this->model->getDefaultSortField();
+    }
+
+    public function getDefaultSortOrder()
+    {
+        return $this->model->getDefaultSortOrder();
+    }
+
     public function getSortOrder()
     {
         $sort = $this->params[self::SORT_KEY];

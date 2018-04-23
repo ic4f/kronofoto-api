@@ -8,5 +8,15 @@ class PageModel extends Model
     protected function getSortCriteria() {}
 
     protected function getFilterCriteria() {}
+
+    public function getDefaultSortField()
+    {
+        return Null;
+    }
+
+    public function getDefaultSortOrder()
+    {
+        return Null;
+    }
 }
 

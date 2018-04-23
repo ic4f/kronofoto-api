@@ -63,6 +63,11 @@ abstract class Controller
             $qBuilder
                 ->orderBy($qs->getSortField(), $qs->getSortOrder());
         }
+        else {
+            $qBuilder
+                ->orderBy($qs->getDefaultSortField(), $qs->getDefaultSortOrder());
+        }
+
 
         //add paging
         if ($paging) {

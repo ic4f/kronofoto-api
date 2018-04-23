@@ -156,7 +156,7 @@ class ItemCest extends ControllerCest
     
     public function testPaging(ApiTester $I) 
     {
-        $this->runTestPaging($I, 42, 10, 'id', 43, 52);
+        $this->runTestPaging($I, 42, 10, 'id', 2763, 2799);
     }
 
     public function runTestSortIdAcs(ApiTester $I) 

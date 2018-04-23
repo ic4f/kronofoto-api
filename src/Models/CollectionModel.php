@@ -26,5 +26,14 @@ class CollectionModel extends Model
     {
         return [];
     }
-}
 
+    public function getDefaultSortField()
+    {
+        return 'donorLastName';
+    }
+
+    public function getDefaultSortOrder()
+    {
+        return 'asc';
+    }
+}

@@ -84,7 +84,7 @@ class CollectionCest extends ControllerCest
     /* --------------- tests for lists of records ---------------- */
     public function testPaging(ApiTester $I) 
     {
-        $this->runTestPaging($I, 42, 10, 'id', 44, 53);
+        $this->runTestPaging($I, 42, 10, 'id', 97, 330);
     }
 
     public function testPagingHeaders(ApiTester $I) 

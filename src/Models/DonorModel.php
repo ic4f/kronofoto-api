@@ -25,4 +25,14 @@ class DonorModel extends Model
             'last_name'
         ];
     }
+
+    public function getDefaultSortField()
+    {
+        return 'lastName';
+    }
+
+    public function getDefaultSortOrder()
+    {
+        return 'asc';
+    }
 }
