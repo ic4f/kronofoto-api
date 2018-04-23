@@ -1,5 +1,12 @@
 <?php
 $base = '/api';
+//
+//get random item 
+$app->get($base . 
+    '/items/random',
+    'Kronofoto\Controllers\ItemController:getRandomFeaturedItem'
+);
+
 
 //get item by identifier
 $app->get($base . 

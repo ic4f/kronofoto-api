@@ -66,7 +66,7 @@ class CollectionController extends Controller
 
         //execute
         $stmt = $qBuilder->execute();
-        $result = $stmt->fetchAll();
+        $result = $stmt->fetch();
         return $response->withJson($result);
     }
 

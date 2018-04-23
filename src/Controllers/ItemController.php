@@ -12,6 +12,28 @@ use Kronofoto\HttpHelper;
 class ItemController extends Controller
 {
 
+    public function getRandomFeaturedItem($request, $response, $args) 
+    {
+        $qBuilder = $this->getQueryBuilder();
+
+        $qBuilder
+            ->select(
+                'id',
+                'identifier'
+            )
+            ->from('archive_item')
+            //TODO: add is_featured after it's implemented (item field? metadata field?)
+            ->where('is_published = 1')
+            ->orderBy('RAND()')
+            ->setMaxResults(1);
+
+        //execute
+        $stmt = $qBuilder->execute();
+        $result = $stmt->fetch();
+        return $response->withJson($result);
+    }
+
+
     //TODO consider factoring out into separate controller
     public function getItemMetadata($request, $response, $args) 
     {

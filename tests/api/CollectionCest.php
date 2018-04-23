@@ -40,7 +40,7 @@ class CollectionCest extends ControllerCest
         $I->sendGET($url);
         $this->checkResponseIsValid($I);
         $data = $I->grabDataFromResponseByJsonPath('$*');
-        $I->assertEquals(3, $data[0]['id']);
+        $I->assertEquals(3, $data[0]);
     }
 
 

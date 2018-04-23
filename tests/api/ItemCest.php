@@ -64,6 +64,19 @@ class ItemCest extends ControllerCest
         $this->runTestReadInvalid($I, 'item', 'id');
     }
 
+    public function testGetRandomFeaturedItem(ApiTester $I)
+    {    
+        $I->wantTo("get a random featured item");
+        $expectedFields = 2;
+        $url = $this->getUrl() . "/random";
+
+        $I->sendGET($url);
+        $this->checkResponseIsValid($I);
+        $data = $I->grabDataFromResponseByJsonPath('$*');
+        $I->assertEquals($expectedFields, count($data));
+    }
+
+
     /* --------------- tests for metadata ---------------- */
     public function testGetMetadataForItem(ApiTester $I)
     {    
