@@ -1,6 +1,5 @@
 <?php
-$base = '/api';
-//
+$base = $container['settings']['baseurl'];
 //get random item 
 $app->get($base . 
     '/items/random',
