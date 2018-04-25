@@ -3,3 +3,5 @@
 /config/settings-local.php
 /config/settings-prod.php
 /utils/
+composer.phar
+api.suite.yml
