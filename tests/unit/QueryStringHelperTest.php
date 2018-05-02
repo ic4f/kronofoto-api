@@ -1,5 +1,5 @@
 <?php
-namespace Kronofoto\Test;
+namespace Kronofoto\Test\Unit;
 
 use Kronofoto\QueryStringHelper;
 use Kronofoto\Models\Model;

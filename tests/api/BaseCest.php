@@ -1,5 +1,5 @@
 <?php
-namespace Kronofoto\Test;
+namespace Kronofoto\Test\API;
 
 //TODO make sure to test incorrect routes
 use ApiTester;

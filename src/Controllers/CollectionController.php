@@ -118,9 +118,4 @@ class CollectionController extends Controller
             //no joins for counting; but this could cause a bug (null related record)
             ->where('c.is_published = 1'); //because for now this is for public site only
     }
-
-    public function getDonorCollections(Request $request, Response $response, array $args) 
-    {
-        //TODO
-    }
 }

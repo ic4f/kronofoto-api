@@ -1,5 +1,5 @@
 <?php
-namespace Kronofoto\Test;
+namespace Kronofoto\Test\APIDB;
 
 require_once 'ControllerCest.php';
 

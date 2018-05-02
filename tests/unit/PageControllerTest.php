@@ -1,27 +1,13 @@
 <?php
-namespace Kronofoto\Test;
+namespace Kronofoto\Test\Unit\Controllers;
 
-use Kronofoto\Controllers\PageController;
+require_once 'ControllerTest.php';
 
-class PageControllerTest extends \Codeception\Test\Unit
+class PageControllerTest extends ControllerTest
 {
-    protected $container; 
-
-    protected function _before()
+    public function testPage()
     {
-        $app = require dirname(dirname(__DIR__)) . '/config/bootstrap.php';
-        $this->container = $app->getContainer();
+        $r = $this->getResponse('GET', '/page/any-page-name');
+        $this->assertEquals(200, $r->getStatusCode());
     }
-
-    public function testFoo()
-    {
-        //create an api with a mock data provider.
-       //make a request 
-        //
-        //
-        //
-
-    }
-
-
 }

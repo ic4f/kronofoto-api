@@ -1,5 +1,5 @@
 <?php
-namespace Kronofoto\Test;
+namespace Kronofoto\Test\Unit;
 
 use Kronofoto\Pagination;
 //TODO add all assertions to all tests: we are testing validity of state after all.

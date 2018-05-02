@@ -1,4 +1,5 @@
-<?php namespace Kronofoto\Test;
+<?php 
+namespace Kronofoto\Test\Unit;
 
 use Kronofoto\Models\CollectionModel;
 

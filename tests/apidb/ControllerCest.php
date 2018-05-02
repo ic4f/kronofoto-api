@@ -1,4 +1,5 @@
-<?php namespace Kronofoto\Test;
+<?php
+namespace Kronofoto\Test\APIDB;
 
 use ApiTester;
 

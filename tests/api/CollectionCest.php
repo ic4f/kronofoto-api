@@ -1,5 +1,5 @@
 <?php
-namespace Kronofoto\Test;
+namespace Kronofoto\Test\API;
 
 require_once 'BaseCest.php';
 
