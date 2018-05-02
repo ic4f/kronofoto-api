@@ -1,11 +1,11 @@
 <?php
 $base = $container['settings']['baseurl'];
+
 //get random item 
 $app->get($base . 
     '/items/random',
     'Kronofoto\Controllers\ItemController:getRandomFeaturedItem'
 );
-
 
 //get item by identifier
 $app->get($base . 
@@ -31,19 +31,19 @@ $app->get($base .
     'Kronofoto\Controllers\CollectionController:getItemCollection'
 );
 
+//get page by address
+$app->get($base . 
+    '/page/{slug}',
+    'Kronofoto\Controllers\PageController:read'
+);
+
 //get item metadata
 $app->get($base . 
     '/items/{identifier}/metadata', 
     'Kronofoto\Controllers\ItemController:getItemMetadata'
 );
 
-//get page by address slug
-$app->get($base . 
-    '/page/{slug}',
-    'Kronofoto\Controllers\PageController:read'
-);
-
-//all 'get records' queries accecpt optional querystrings
+/* all 'get records' queries accept optional querystrings */
 
 //get items
 $app->get($base . 

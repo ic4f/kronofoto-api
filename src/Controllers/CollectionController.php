@@ -54,6 +54,8 @@ class CollectionController extends Controller
                 'c.description',
                 'c.created',
                 'c.modified',
+                'c.featured_item_id as featuredItemId',
+                'i.identifier as featuredItemIdentifier',
                 'c.donor_id as donorId',
                 'u.first_name as donorFirstName',
                 'u.last_name as donorLastName'
@@ -91,7 +93,7 @@ class CollectionController extends Controller
                 'c.description',
                 'c.created',
                 'c.modified',
-                'c.featured_item_id as fieaturedItemId',
+                'c.featured_item_id as featuredItemId',
                 'i.identifier as featuredItemIdentifier',
                 'c.donor_id as donorId',
                 'u.first_name as donorFirstName',

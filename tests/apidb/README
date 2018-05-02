@@ -1,0 +1,5 @@
+These tests run against a test database. 
+TODO: 
+- setup/teardown needs to be added;
+- replace old data with generated test data.
+

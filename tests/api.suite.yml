@@ -5,6 +5,6 @@ modules:
     - \Helper\Unit
     - REST:
         depends: PhpBrowser
-        url: http://134.161.122.73:8080
+        url: http://localhost:8080
         part: Json
 

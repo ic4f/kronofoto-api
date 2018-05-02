@@ -5,3 +5,4 @@
 /utils/
 composer.phar
 api.suite.yml
+apidb.suite.yml
