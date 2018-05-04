@@ -6,3 +6,4 @@
 composer.phar
 api.suite.yml
 apidb.suite.yml
+run.sh

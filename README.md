@@ -5,7 +5,7 @@ It is part of *Kronofoto*, an umbrella term for three loosely coupled applicatio
 manage a digital archive like Fortepan Iowa:
 
 * kronofoto-api (API consumed by a web-based front-end) 
-* kronofoto-ng (public front-end)
+* [kronofoto-ng](https://github.com/ic4f/kronofoto-ng) (public front-end)
 * kronofoto-admin (web-based archive management system)
 
 kronofoto-api is implemented on top of the [Slim framework](https://github.com/slimphp/Slim). It
