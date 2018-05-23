@@ -6,7 +6,7 @@ manage a digital archive like Fortepan Iowa:
 
 * kronofoto-api (API consumed by a web-based front-end) 
 * [kronofoto-ng](https://github.com/ic4f/kronofoto-ng) (public front-end)
-* kronofoto-admin (web-based archive management system)
+* [kronofoto-admin](https://github.com/ic4f/kronofoto-admin) (web-based archive management system)
 
 kronofoto-api is implemented on top of the [Slim framework](https://github.com/slimphp/Slim). It
 uses [Doctrine DBAL](https://github.com/doctrine/dbal) as its (relational) database abstraction
