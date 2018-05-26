@@ -13,10 +13,7 @@ uses [Doctrine DBAL](https://github.com/doctrine/dbal) as its (relational) datab
 layer and [Codeception](https://github.com/Codeception/Codeception) as its testing framework.
 
 ### Expected Release 
-Currently, kronofoto-api is in pre-alpha state; however, it is operational and is
-used by the development version of kronofoto-ng ([current demo version available
-here](http://sergey.cs.uni.edu:8080/public/collections)). I expect to have it ready for an alpha
-release this summer.
+Currently, kronofoto-api is in pre-alpha state. I expect to have it ready for an alpha release this summer.
 
 ### Extension 
 Although built for Fortepan Iowa, kronofoto-api is designed to be collection-agnostic and
